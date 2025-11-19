@@ -35,6 +35,9 @@ private:
     //缩放
     int zoom(const int percent);
 
+    //键盘事件响应
+    void keyPressEvent(QKeyEvent *ev) override;
+
 private:
     Ui::CImgView *ui;
 

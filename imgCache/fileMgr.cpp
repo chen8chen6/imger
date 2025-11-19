@@ -30,10 +30,9 @@ int CFileMgr::init(const QString &imgPath)
             break;
 
         //定位迭代器
-        m_prev = std::find(m_fileList.begin(), m_fileList.end(), imgFile);
-        if (m_fileList.end() == m_prev)
+        m_cur = std::find(m_fileList.begin(), m_fileList.end(), imgFile);
+        if (m_fileList.end() == m_cur)
             break;  //文件非图片
-        m_next = m_prev;
 
         isSucc = true;
     } while(0);
@@ -43,8 +42,32 @@ int CFileMgr::init(const QString &imgPath)
 
 QFileInfo CFileMgr::next()
 {
-    //TODO:注意在fileList.size < buf_size的情况下, next和prev可能会重叠
-    if (m_fileList.end() == m_next)
-        m_next = m_fileList.begin();
-    return *(m_next++);
+    moveForward();
+    return *m_cur;
+}
+
+QFileInfoList CFileMgr::next(int num)
+{
+    //TODO: 处理num > list.size
+    QFileInfoList res;
+    for (int i = 0; i < num; ++i)
+    {
+        moveForward();
+        res.push_back(*m_cur);
+    }
+    return res;
+}
+
+void CFileMgr::moveForward(int d)
+{
+    //TODO: 使用distance()去除循环
+    //TODO: 对d=1优化计算
+    //TODO: realDistance = d%list.size()
+    for (int i = 0; i < d; ++i)
+    {
+        ++m_cur;
+        if (m_fileList.end() == m_cur)
+            m_cur = m_fileList.begin();
+    }
+    return;
 }

@@ -11,14 +11,27 @@ CImgCacheBuffer::~CImgCacheBuffer()
 
 }
 
-int CImgCacheBuffer::cache(QPixmap &img)
+int CImgCacheBuffer::cache(const QFileInfo &info, QPixmap img)
 {
-    //TODO: 暂时处理非环形版本
-    if (m_idxBegin == BUF_SIZE)
-        return -1;
-    m_buf.at(m_idxBegin).reset(new QPixmap(img));
-    qDebug() << m_idxBegin << ": " << m_buf.at(m_idxBegin).get()
-             <<"(" << m_buf.at(m_idxBegin)->size();
-    ++m_idxBegin;
+    //维护缓冲区大小
+    while (BUF_SIZE <= m_buf.size())
+    {
+        m_buf.pop_front();
+    }
+
+    qDebug() << "(" << m_buf.size() << ")"
+             << info.absoluteFilePath()
+             << img.size();
+    m_buf.push_back({info, pImg_t(new QPixmap(img))});
     return 0;
+}
+
+TImgFile CImgCacheBuffer::next()
+{
+    static TImgFile empty{QFileInfo(), nullptr};
+    if (m_buf.size() < 2)
+        return empty;
+
+    m_buf.pop_front();
+    return m_buf.front();
 }

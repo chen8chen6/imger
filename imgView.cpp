@@ -2,6 +2,7 @@
 #include "ui_imgView.h"
 
 #include <QDebug>
+#include <QKeyEvent>
 #include "imgCache.h"
 #include "displayPolocy.h"
 
@@ -59,10 +60,36 @@ int CImgView::init(const QString &imgPath)
     return isSucc ? 0: -1;
 }
 
+int CImgView::displayNext()
+{
+    auto imgFile = m_cache->next();
+    qDebug() << "display " << imgFile.m_info.absoluteFilePath();
+    m_curImg = imgFile.m_pImg;
+    display(m_curImg.get());
+    return 0;
+}
+
 int CImgView::display(QPixmap *img)
 {
     QPixmap scaled = *img;
     m_displayPolicy->process(&scaled);
     ui->lbImg->setPixmap(scaled);
     return 0;
+}
+
+void CImgView::keyPressEvent(QKeyEvent *ev)
+{
+    if (nullptr == ev)
+        return;
+
+    switch (ev->key())
+    {
+    case Qt::Key_Space:
+        displayNext();
+        break;
+    default:
+        break;
+    }
+
+    return;
 }

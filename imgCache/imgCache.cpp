@@ -24,20 +24,22 @@ int CImgCache::init(const QString &imgPath)
         m_fileMgr.reset(new CFileMgr);
         if (0 != m_fileMgr->init(imgPath))
             break;
-        m_curFile = QFileInfo(imgPath);
 
         //缓冲
         qDebug() << "=== cache ===";
         m_buf.reset(new CImgCacheBuffer);
         constexpr int bufSize = CImgCacheBuffer::BUF_SIZE;
         const int cacheCnt = std::min(m_fileMgr->size(), bufSize);
-        for (int i = 0; i < cacheCnt; ++i)
+
+        //TODO: 简化缓冲流程
+        //缓冲第一张
+        m_buf->cache(QFileInfo(imgPath), QPixmap(imgPath));
+
+        //缓冲剩余的图片
+        for (int i = 1; i < cacheCnt; ++i)
         {
-            const QString imgPath = m_fileMgr->next().absoluteFilePath();
-            qDebug() << imgPath;
-            QPixmap img(imgPath);
-            qDebug() << img.size();
-            m_buf->cache(img);
+            auto file2Cache = m_fileMgr->next();
+            m_buf->cache(file2Cache, QPixmap(file2Cache.absoluteFilePath()));
         }
         qDebug() << "=============";
 
@@ -54,8 +56,20 @@ int CImgCache::init(const QString &imgPath)
     return isSucc ? 0 : -1;
 }
 
-CImgCache::TImgFile CImgCache::cur()
+TImgFile CImgCache::cur() const
 {
-    return {m_curFile, m_buf->first()};
+    return m_buf->cur();
+}
+
+TImgFile CImgCache::next()
+{
+    //TODO: 这段代码可读性差
+    auto ret = m_buf->next();
+
+    //更新缓冲区
+    QFileInfo file2Cache = m_fileMgr->next();
+    m_buf->cache(file2Cache, QPixmap(file2Cache.absoluteFilePath()));
+
+    return ret;
 }
 

@@ -31,6 +31,7 @@ HEADERS += \
     imgCache/fileMgr.h \
     imgCache/imgCache.h \
     imgCache/imgCacheBuffer.h \
+    imgCache/imgType.h \
     imgView.h
 
 FORMS += \
