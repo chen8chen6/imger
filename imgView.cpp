@@ -22,27 +22,26 @@ int CImgView::init(const QString &imgPath)
     bool isSucc = false;
     do {
         //图片缓冲
-        m_cache = new CImgCache;
+        m_cache.reset(new CImgCache);
         if (0 != m_cache->init(imgPath))
             break;
 
         //显示策略
-        m_displayPolicy = new CRealSize;
+        m_displayPolicy.reset(new CRealSize);
 
         //显示图片
         auto imgFile = m_cache->cur();
-        if (nullptr == imgFile.second
-                //|| imgFile.second->isNull()
-                )
+        if (nullptr == imgFile.m_pImg
+                || imgFile.m_pImg->isNull())
         {
-            qDebug() << "invalid img: " << imgFile.first.absoluteFilePath();
+            qDebug() << "invalid img: " << imgFile.m_info.absoluteFilePath();
             break;
         }
 
-        m_curImg = imgFile.second;
-        if (0 != display(m_curImg))
+        m_curImg = imgFile.m_pImg;
+        if (0 != display(m_curImg.get()))
         {
-            qDebug() << "display img faild: " << imgFile.first.absoluteFilePath();
+            qDebug() << "display img faild: " << imgFile.m_info.absoluteFilePath();
             break;
         }
 
@@ -52,17 +51,9 @@ int CImgView::init(const QString &imgPath)
     if (!isSucc)
     {
         //释放资源
-        if (nullptr != m_cache)
-        {
-            delete m_cache;
-            m_cache = nullptr;
-        }
-
-        if (nullptr != m_displayPolicy)
-        {
-            delete m_displayPolicy;
-            m_displayPolicy = nullptr;
-        }
+        m_cache.reset();
+        m_displayPolicy.reset();
+        m_curImg.reset();
     }
 
     return isSucc ? 0: -1;

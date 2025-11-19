@@ -2,6 +2,7 @@
 #define IMGVIEW_H
 
 #include <QDialog>
+#include <memory>   //std::shared_ptr
 
 namespace Ui {
 class CImgView;
@@ -37,9 +38,9 @@ private:
 private:
     Ui::CImgView *ui;
 
-    QPixmap *m_curImg = nullptr;
-    CImgCache *m_cache = nullptr;               //图片缓存池
-    CDisplayPolicy *m_displayPolicy = nullptr;  //图片显示状态
+    std::shared_ptr<QPixmap> m_curImg = nullptr;
+    std::shared_ptr<CImgCache> m_cache = nullptr;               //图片缓存池
+    std::shared_ptr<CDisplayPolicy> m_displayPolicy = nullptr;  //图片显示状态
     struct {
         int m_centerX = 0;          //当前焦点
         int m_centerY = 0;

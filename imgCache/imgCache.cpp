@@ -11,11 +11,7 @@ CImgCache::CImgCache()
 
 CImgCache::~CImgCache()
 {
-    if (nullptr != m_fileMgr)
-        delete m_fileMgr;
-    if (nullptr != m_buf)
-        delete m_buf;
-    return;
+
 }
 
 int CImgCache::init(const QString &imgPath)
@@ -25,14 +21,14 @@ int CImgCache::init(const QString &imgPath)
     do
     {
         //文件列表
-        m_fileMgr = new CFileMgr;
+        m_fileMgr.reset(new CFileMgr);
         if (0 != m_fileMgr->init(imgPath))
             break;
         m_curFile = QFileInfo(imgPath);
 
         //缓冲
         qDebug() << "=== cache ===";
-        m_buf = new CImgCacheBuffer;
+        m_buf.reset(new CImgCacheBuffer);
         constexpr int bufSize = CImgCacheBuffer::BUF_SIZE;
         const int cacheCnt = std::min(m_fileMgr->size(), bufSize);
         for (int i = 0; i < cacheCnt; ++i)
@@ -51,23 +47,14 @@ int CImgCache::init(const QString &imgPath)
     if (!isSucc)
     {
         //释放资源
-        if (nullptr != m_fileMgr)
-        {
-            delete m_fileMgr;
-            m_fileMgr = nullptr;
-        }
-
-        if (nullptr != m_buf)
-        {
-            delete m_buf;
-            m_buf = nullptr;
-        }
+        m_fileMgr.reset();
+        m_buf.reset();
     }
 
     return isSucc ? 0 : -1;
 }
 
-CImgCache::imgFile_t CImgCache::cur()
+CImgCache::TImgFile CImgCache::cur()
 {
     return {m_curFile, m_buf->first()};
 }

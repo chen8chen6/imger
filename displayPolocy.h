@@ -7,9 +7,8 @@ class QPixmap;
 class CDisplayPolicy
 {
 public:
-    CDisplayPolicy() {};
-    virtual ~CDisplayPolicy() {};
-
+    CDisplayPolicy() {}
+    virtual ~CDisplayPolicy();
     virtual int process(QPixmap *img) = 0;
 };
 
