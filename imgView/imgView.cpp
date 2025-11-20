@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include "displayPolocy.h"
 #include "imgMgr.h"
+#include "fileMgr.h"
 
 CImgView::CImgView(QWidget *parent) :
     QDialog(parent),
@@ -22,9 +23,15 @@ int CImgView::init(const QString &imgPath)
 {
     bool isSucc = false;
     do {
+        //文件管理
+        std::shared_ptr<CFileMgr> fileMgr(new CFileMgr);
+        //TODO: 设置filter, order等
+        if (0 != fileMgr->init(imgPath))
+            break;
+
         //图片缓冲
-        m_imgMgr.reset(new CImgMgr);
-        if (0 != m_imgMgr->init(imgPath))
+        m_imgMgr = CImgMgrFac::create(fileMgr->size());
+        if (0 != m_imgMgr->init(imgPath, fileMgr))
             break;
 
         //显示策略

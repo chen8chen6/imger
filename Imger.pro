@@ -21,6 +21,7 @@ INCLUDEPATH += \
     imgView
 
 SOURCES += \
+    imgMgr/cacheAll.cpp \
     imgMgr/cacheByNum.cpp \
     imgView/displayPolocy.cpp \
     fileMgr/fileMgr.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+    imgMgr/cacheAll.h \
     imgMgr/cacheByNum.h \
     imgView/displayPolocy.h \
     fileMgr/fileMgr.h \

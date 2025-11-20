@@ -29,8 +29,6 @@ int CFileMgr::init(const QString &imgPath)
         if (0 == m_fileList.size())
             break;
 
-        //qDebug() << "(" << m_fileList.size() << ")" <<endl << m_fileList;
-
         isSucc = true;
     } while(0);
 
