@@ -16,24 +16,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH += \
-    ./imgCache
+    imgMgr \
+    fileMgr \
+    imgView
 
 SOURCES += \
-    displayPolocy.cpp \
-    imgCache/fileMgr.cpp \
-    imgCache/imgMgr.cpp \
-    imgView.cpp \
+    imgMgr/cacheByNum.cpp \
+    imgView/displayPolocy.cpp \
+    fileMgr/fileMgr.cpp \
+    imgMgr/imgMgr.cpp \
+    imgView/imgView.cpp \
     main.cpp
 
 HEADERS += \
-    displayPolocy.h \
-    imgCache/fileMgr.h \
-    imgCache/imgMgr.h \
-    imgCache/imgType.h \
-    imgView.h
+    imgMgr/cacheByNum.h \
+    imgView/displayPolocy.h \
+    fileMgr/fileMgr.h \
+    imgMgr/imgMgr.h \
+    imgType.h \
+    imgView/imgView.h
 
 FORMS += \
-    imgView.ui
+    imgView/imgView.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
