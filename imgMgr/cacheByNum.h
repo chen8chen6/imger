@@ -7,7 +7,8 @@
 class CCacheByNum : public CImgMgr
 {
 public:
-    CCacheByNum(){}
+    CCacheByNum();
+    ~CCacheByNum() override;
 
     //缓冲池大小
     static constexpr int cacheSize(void) {return FORWARD_CACHE_SIZE + BACKWARD_CACHE_SIZE + 1;}

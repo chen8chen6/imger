@@ -23,6 +23,7 @@ INCLUDEPATH += \
 SOURCES += \
     imgMgr/cacheAll.cpp \
     imgMgr/cacheByNum.cpp \
+    imgMgr/imgLoader.cpp \
     imgView/displayPolocy.cpp \
     fileMgr/fileMgr.cpp \
     imgMgr/imgMgr.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 HEADERS += \
     imgMgr/cacheAll.h \
     imgMgr/cacheByNum.h \
+    imgMgr/imgLoader.h \
     imgView/displayPolocy.h \
     fileMgr/fileMgr.h \
     imgMgr/imgMgr.h \

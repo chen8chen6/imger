@@ -16,7 +16,8 @@ int CCacheAll::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
     QFileInfoList allFiles = fileMgr->allFiles();
     for (const auto &file : allFiles)
     {
-        m_cache.push_back({file, pImg_t(new QPixmap(file.absoluteFilePath()))});
+        //这个策略里, pImg_t是线程安全的, pMutex可以为空指针
+        m_cache.push_back({file, pImg_t(new QPixmap(file.absoluteFilePath())), nullptr});
     }
 
     //定位迭代器

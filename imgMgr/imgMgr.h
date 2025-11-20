@@ -1,11 +1,14 @@
 #ifndef CIMGMGR_H
 #define CIMGMGR_H
 
+#include <QThread>
+#include <QVariant>
 #include "imgType.h"
 
 class CFileMgr;
-class CImgMgr
+class CImgMgr : public QObject
 {
+    Q_OBJECT
 public:
     CImgMgr();
     virtual ~CImgMgr();
@@ -15,6 +18,16 @@ public:
     virtual TImgFile cur(void) const = 0;
     virtual TImgFile prev(void) = 0;
     virtual TImgFile next(void) = 0;
+
+signals:
+    void sigLoadImg(QVariant var);
+
+protected:
+    int initImgLoaderThr(void);
+    int uninitImgLoaderThr(void);
+
+protected:
+    QThread m_imgLoaderThr;
 };
 
 //图像管理类的工厂

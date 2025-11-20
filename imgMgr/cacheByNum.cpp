@@ -4,6 +4,16 @@
 #include <QDebug>
 #include "fileMgr.h"
 
+CCacheByNum::CCacheByNum()
+{
+    initImgLoaderThr();
+}
+
+CCacheByNum::~CCacheByNum()
+{
+    uninitImgLoaderThr();
+}
+
 int CCacheByNum::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
 {
     bool isSucc = false;
@@ -18,7 +28,7 @@ int CCacheByNum::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
             break;  //不是图片文件
 
         //缓存
-        m_cache = {{curImg, pImg_t(new QPixmap(imgPath))}};
+        m_cache = {{curImg, pImg_t(new QPixmap(imgPath)), std::shared_ptr<std::mutex>(new std::mutex)}};
         m_cur = m_cache.begin();
 
         QFileInfoList file2Cache = m_fileMgr->nFilesAfter(FORWARD_CACHE_SIZE, curImg);
@@ -74,12 +84,18 @@ TImgFile CCacheByNum::next()
 
 int CCacheByNum::cachePrev(QFileInfo file)
 {
-    m_cache.push_front({file, pImg_t(new QPixmap(file.absoluteFilePath()))});
+    //m_cache.push_front({file, pImg_t(new QPixmap(file.absoluteFilePath()))});
+    TImgFile imgFile{file, pImg_t(new QPixmap), std::shared_ptr<std::mutex>(new std::mutex)};
+    m_cache.push_front(imgFile);
+    emit sigLoadImg(QVariant::fromValue(imgFile));
     return 0;
 }
 
 int CCacheByNum::cacheNext(QFileInfo file)
 {
-    m_cache.push_back({file, pImg_t(new QPixmap(file.absoluteFilePath()))});
+    //m_cache.push_back({file, pImg_t(new QPixmap(file.absoluteFilePath()))});
+    TImgFile imgFile{file, pImg_t(new QPixmap), std::shared_ptr<std::mutex>(new std::mutex)};
+    m_cache.push_back(imgFile);
+    emit sigLoadImg(QVariant::fromValue(imgFile));
     return 0;
 }

@@ -69,6 +69,7 @@ int CImgView::displayPrev()
 {
     auto imgFile = m_imgMgr->prev();
     qDebug() << "<-(display) " << imgFile.m_info.absoluteFilePath();
+    std::unique_lock<std::mutex> locker(*(imgFile.m_mutex));
     display(imgFile.m_pImg.get());
     return 0;
 }
@@ -77,6 +78,7 @@ int CImgView::displayNext()
 {
     auto imgFile = m_imgMgr->next();
     qDebug() << "(display)-> " << imgFile.m_info.absoluteFilePath();
+    std::unique_lock<std::mutex> locker(*(imgFile.m_mutex));
     display(imgFile.m_pImg.get());
     return 0;
 }
