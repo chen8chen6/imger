@@ -9,7 +9,7 @@ CFileMgr::CFileMgr()
 
 CFileMgr::~CFileMgr()
 {
-    m_fileList.clear();
+
 }
 
 int CFileMgr::init(const QString &imgPath)
@@ -29,10 +29,7 @@ int CFileMgr::init(const QString &imgPath)
         if (0 == m_fileList.size())
             break;
 
-        //定位迭代器
-        m_cur = std::find(m_fileList.begin(), m_fileList.end(), imgFile);
-        if (m_fileList.end() == m_cur)
-            break;  //文件非图片
+        //qDebug() << "(" << m_fileList.size() << ")" <<endl << m_fileList;
 
         isSucc = true;
     } while(0);
@@ -40,34 +37,80 @@ int CFileMgr::init(const QString &imgPath)
     return isSucc ? 0 : -1;
 }
 
-QFileInfo CFileMgr::next()
+bool CFileMgr::exist(const QFileInfo &file) const
 {
-    moveForward();
-    return *m_cur;
+    return fileConstIter(file) != m_fileList.cend();
 }
 
-QFileInfoList CFileMgr::next(int num)
+QFileInfo CFileMgr::fileBefore(const QFileInfo &file)
 {
-    //TODO: 处理num > list.size
-    QFileInfoList res;
-    for (int i = 0; i < num; ++i)
-    {
-        moveForward();
-        res.push_back(*m_cur);
-    }
-    return res;
+    auto iter = fileConstIter(file);
+    moveBackward(iter);
+    return *iter;
 }
 
-void CFileMgr::moveForward(int d)
+QFileInfoList CFileMgr::nFilesBefore(int n, const QFileInfo &file)
 {
-    //TODO: 使用distance()去除循环
-    //TODO: 对d=1优化计算
-    //TODO: realDistance = d%list.size()
-    for (int i = 0; i < d; ++i)
+    auto iter = fileConstIter(file);
+    if (m_fileList.cend() == iter)
+        return {};
+
+    QFileInfoList ret;
+    for (int i = 0; i < n; ++i)
     {
-        ++m_cur;
-        if (m_fileList.end() == m_cur)
-            m_cur = m_fileList.begin();
+        moveBackward(iter);
+        ret.push_back(*iter);
     }
-    return;
+
+    return ret;
 }
+
+QFileInfo CFileMgr::fileAfter(const QFileInfo &file)
+{
+    auto iter = fileConstIter(file);
+    if (m_fileList.cend() == iter)
+        return {};
+
+    moveForward(iter);
+    return *iter;
+}
+
+QFileInfoList CFileMgr::nFilesAfter(int n, const QFileInfo &file)
+{
+    auto iter = fileConstIter(file);
+    if (m_fileList.cend() == iter)
+        return {};
+
+    QFileInfoList ret;
+    for (int i = 0; i < n; ++i)
+    {
+        moveForward(iter);
+        ret.push_back(*iter);
+    }
+
+    return ret;
+}
+
+/*QFileInfoList::iterator CFileMgr::fileIter(const QFileInfo &file)
+{
+    return std::find(m_fileList.begin(), m_fileList.end(), file);
+}*/
+
+QFileInfoList::const_iterator CFileMgr::fileConstIter(const QFileInfo &file) const
+{
+    return std::find(m_fileList.cbegin(), m_fileList.cend(), file);
+}
+
+void CFileMgr::moveForward(QFileInfoList::const_iterator &iter) const
+{
+    if (m_fileList.cend() == ++iter)
+        iter = m_fileList.begin();
+}
+
+void CFileMgr::moveBackward(QFileInfoList::const_iterator &iter) const
+{
+    if (m_fileList.begin() == iter)
+        iter = m_fileList.cend();
+    --iter;
+}
+

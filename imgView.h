@@ -9,7 +9,7 @@ class CImgView;
 }
 
 //class QPixmap;
-class CImgCache;
+class CImgMgr;
 class CDisplayPolicy;
 
 class CImgView : public QDialog
@@ -41,8 +41,8 @@ private:
 private:
     Ui::CImgView *ui;
 
-    std::shared_ptr<QPixmap> m_curImg = nullptr;
-    std::shared_ptr<CImgCache> m_cache = nullptr;               //图片缓存池
+    //std::shared_ptr<QPixmap> m_curImg = nullptr;
+    std::shared_ptr<CImgMgr> m_imgMgr = nullptr;               //图片缓存池
     std::shared_ptr<CDisplayPolicy> m_displayPolicy = nullptr;  //图片显示状态
     struct {
         int m_centerX = 0;          //当前焦点

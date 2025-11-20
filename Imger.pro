@@ -21,16 +21,14 @@ INCLUDEPATH += \
 SOURCES += \
     displayPolocy.cpp \
     imgCache/fileMgr.cpp \
-    imgCache/imgCache.cpp \
-    imgCache/imgCacheBuffer.cpp \
+    imgCache/imgMgr.cpp \
     imgView.cpp \
     main.cpp
 
 HEADERS += \
     displayPolocy.h \
     imgCache/fileMgr.h \
-    imgCache/imgCache.h \
-    imgCache/imgCacheBuffer.h \
+    imgCache/imgMgr.h \
     imgCache/imgType.h \
     imgView.h
 

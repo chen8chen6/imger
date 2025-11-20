@@ -3,8 +3,6 @@
 
 #include <QFileInfoList>
 
-//TODO: 目前的设计实际上不能处理用户反复在2张图片切换时的缓冲返回
-//TODO: fileMgr和cacheBuf的前/后/当前是保持一致的, fileMgr是不是该由cacheBuf持有
 class CFileMgr
 {
 public:
@@ -12,21 +10,30 @@ public:
     virtual ~CFileMgr();
 
     int init(const QString &imgPath);
+    QFileInfoList::size_type size(void) const {return m_fileList.size();}
+    bool exist(const QFileInfo &file) const;
 
-    //返回前/后n个文件的信息, m_cur也会移动相应的距离
-    QFileInfo prev(void);
-    QFileInfo next(void);
-    QFileInfoList next(int num);
+    //获取指定文件前/后的n个文件
+    QFileInfo fileBefore(const QFileInfo &file);
+    QFileInfoList nFilesBefore(int n, const QFileInfo &file);
+    QFileInfo fileAfter(const QFileInfo &file);
+    QFileInfoList nFilesAfter(int n, const QFileInfo &file);
 
-    //TODO: 提供仅移动m_cur指针的方法, 但名字要合理
-    int size(void) const {return m_fileList.size();}
+    QFileInfoList allFiles(void) {return m_fileList;}
 
 private:
-    void moveForward(int d = 1);    //TODO: rename, 而且要显示指出m_cur会变化
+    //查找指定文件在列表中的位置
+    //QFileInfoList::iterator fileIter(const QFileInfo &file);
+    QFileInfoList::const_iterator fileConstIter(const QFileInfo &file) const;
+
+    //移动迭代器, 如果到达末尾, 则移动到最前端
+    void moveForward(QFileInfoList::const_iterator &iter) const;
+    void moveBackward(QFileInfoList::const_iterator &iter) const;
 
 private:
     QFileInfoList m_fileList;   //文件列表
-    QFileInfoList::iterator m_cur;  //类初始化后, 始终指向有效元素
+    //TODO: 使用window加速搜索
+
 };
 
 #endif // CFILEMGR_H

@@ -3,8 +3,8 @@
 
 #include <QDebug>
 #include <QKeyEvent>
-#include "imgCache.h"
 #include "displayPolocy.h"
+#include "imgMgr.h"
 
 CImgView::CImgView(QWidget *parent) :
     QDialog(parent),
@@ -23,15 +23,15 @@ int CImgView::init(const QString &imgPath)
     bool isSucc = false;
     do {
         //图片缓冲
-        m_cache.reset(new CImgCache);
-        if (0 != m_cache->init(imgPath))
+        m_imgMgr.reset(new CImgMgr);
+        if (0 != m_imgMgr->init(imgPath))
             break;
 
         //显示策略
         m_displayPolicy.reset(new CRealSize);
 
         //显示图片
-        auto imgFile = m_cache->cur();
+        auto imgFile = m_imgMgr->cur();
         if (nullptr == imgFile.m_pImg
                 || imgFile.m_pImg->isNull())
         {
@@ -39,8 +39,7 @@ int CImgView::init(const QString &imgPath)
             break;
         }
 
-        m_curImg = imgFile.m_pImg;
-        if (0 != display(m_curImg.get()))
+        if (0 != display(imgFile.m_pImg.get()))
         {
             qDebug() << "display img faild: " << imgFile.m_info.absoluteFilePath();
             break;
@@ -52,20 +51,26 @@ int CImgView::init(const QString &imgPath)
     if (!isSucc)
     {
         //释放资源
-        m_cache.reset();
+        m_imgMgr.reset();
         m_displayPolicy.reset();
-        m_curImg.reset();
     }
 
     return isSucc ? 0: -1;
 }
 
+int CImgView::displayPrev()
+{
+    auto imgFile = m_imgMgr->prev();
+    qDebug() << "<-(display) " << imgFile.m_info.absoluteFilePath();
+    display(imgFile.m_pImg.get());
+    return 0;
+}
+
 int CImgView::displayNext()
 {
-    auto imgFile = m_cache->next();
-    qDebug() << "display " << imgFile.m_info.absoluteFilePath();
-    m_curImg = imgFile.m_pImg;
-    display(m_curImg.get());
+    auto imgFile = m_imgMgr->next();
+    qDebug() << "(display)-> " << imgFile.m_info.absoluteFilePath();
+    display(imgFile.m_pImg.get());
     return 0;
 }
 
@@ -82,9 +87,13 @@ void CImgView::keyPressEvent(QKeyEvent *ev)
     if (nullptr == ev)
         return;
 
+    qDebug() << "-----" << ev;
     switch (ev->key())
     {
-    case Qt::Key_Space:
+    case Qt::Key_Z:
+        displayPrev();
+        break;
+    case Qt::Key_X:
         displayNext();
         break;
     default:
