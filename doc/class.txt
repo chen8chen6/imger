@@ -20,15 +20,10 @@
 
 --------------------------------------------------
 |                CImgMgr
+|   抽象类, 子类有CCacheByNum, CCacheAll
 |      负责管理图片缓存与切换顺序
 --------------------------------------------------
-| + FORWARD_CACHE_SIZE = 10 {向后缓存数量}
-| + BACKWARD_CACHE_SIZE = 9 {向前缓存数量}
-| - m_fileMgr: CFileMgr* = nullptr
-| - m_cache: list<TImgFile>
-| - m_cur: iterator = m_cache.begin()
---------------------------------------------------
-| + init(imgPath: QString) : int
+| + init(imgPath: QString, fileMgr: CFileMgr*) : int
 | + cur(void) : TImgFile
 | + prev(void) : TImgFile
 | + next(void) : TImgFile
