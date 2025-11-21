@@ -4,6 +4,8 @@
 |                  CImgView
 |                负责显示图像
 --------------------------------------------------
+| - INTERVAL_CHECK_IMG_LOADED_MS: int = 50 {检查图像是否载入完成的时间间隔}
+| - m_checkLoaded: QTimer * = nullptr {每隔一段时间检查图片是否加载完成}
 | - m_imgMgr: CImgMgr * = nullptr
 | - m_displayPolicy : CDisplayPolicy * = nullptr
 | - m_displaySt: TDisplaySt
@@ -12,10 +14,11 @@
 | + display(imgPath) : int
 | + displayPrev(void) : int
 | + displayNext(void) : int
-| + onSigLoaded(file: var) : void
 | - display(img:QPixmap *) : int
+| - display(imgFile: pImgFile_t) : int
 | - moveVisableArea(dx:int, dy:int) : int
 | - zoom(percent:int) : int {percent = 1~1000}
+| - updateIfLoaded(void) : int
 --------------------------------------------------
 
 --------------------------------------------------
@@ -29,14 +32,11 @@
 | + cur(void) : pImgFile_t
 | + prev(void) : pImgFile_t
 | + next(void) : pImgFile_t
-| + sigLoadImg(pImgFile: var) : void
 --------------------------------------------------
 
 --------------------------------------------------
 |              CImgLoader
 |             负责读取图片
---------------------------------------------------
-| + sigLoaded(file: var)
 --------------------------------------------------
 | + onSigLoadImg(pImgFile: var) : void { 信号槽 }
 --------------------------------------------------

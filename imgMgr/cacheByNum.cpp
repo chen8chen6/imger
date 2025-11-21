@@ -44,7 +44,7 @@ int CCacheByNum::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
 
         qDebug() << "=== cache ===" ;
         for (const auto &imgFile : m_cache)
-            qDebug() << imgFile->m_info.fileName() << imgFile->m_pImg->size();
+            qDebug() << imgFile->m_info.fileName();
         qDebug() << "=============";
 
         isSucc = true;

@@ -2,9 +2,7 @@
 #define IMGVIEW_H
 
 #include <QDialog>
-#include <QVariant>
 #include <memory>   //std::shared_ptr
-
 
 namespace Ui {
 class CImgView;
@@ -13,6 +11,7 @@ class CImgView;
 //class QPixmap;
 class CImgMgr;
 class CDisplayPolicy;
+struct tag_imgFile;
 
 class CImgView : public QDialog
 {
@@ -27,12 +26,10 @@ public:
     int displayPrev(void);
     int displayNext(void);
 
-public slots:
-    void onSigLoaded(QVariant var_file);
-
 private:
     //显示
     int display(QPixmap *img);
+    int display(tag_imgFile * pImgFile);
 
     //移动
     int moveVisableArea(const int dx, const int dy);
@@ -43,10 +40,15 @@ private:
     //键盘事件响应
     void keyPressEvent(QKeyEvent *ev) override;
 
+private slots:
+    void  updateIfLoaded(void);
+
 private:
+    static constexpr int INTERVAL_CHECK_IMG_LOADED_MS = 50; //检查图像是否载入完成的时间间隔
+
     Ui::CImgView *ui;
 
-    std::shared_ptr<QPixmap> m_imgLoading = nullptr;    //"loading"图片
+    QTimer * m_checkLoaded = nullptr;   //每隔一段时间检查图片是否加载完成
     std::shared_ptr<CImgMgr> m_imgMgr = nullptr;                //图片缓存池
     std::shared_ptr<CDisplayPolicy> m_displayPolicy = nullptr;  //图片显示状态
     struct {

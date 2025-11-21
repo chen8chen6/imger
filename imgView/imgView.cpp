@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QKeyEvent>
+#include <QTimer>
 #include "displayPolocy.h"
 #include "imgMgr.h"
 #include "fileMgr.h"
@@ -12,6 +13,10 @@ CImgView::CImgView(QWidget *parent) :
     ui(new Ui::CImgView)
 {
     ui->setupUi(this);
+
+    //图片载入完成时, 进行更新
+    m_checkLoaded = new QTimer(this);
+    connect(m_checkLoaded, &QTimer::timeout, this, &CImgView:: updateIfLoaded);
 }
 
 CImgView::~CImgView()
@@ -30,23 +35,15 @@ int CImgView::init(const QString &imgPath)
             break;
 
         //图片管理
-        m_imgLoading.reset(new QPixmap(":/res/img/loading.jpg"));
         m_imgMgr = CImgMgrFac::create(fileMgr->size());
         if (0 != m_imgMgr->init(imgPath, fileMgr))
             break;
-        connect(m_imgMgr.get(), &CImgMgr::sigLoaded, this, &CImgView::onSigLoaded);
 
         //显示策略
         m_displayPolicy.reset(new CRealSize);
 
         //显示图片
-        auto pImgFile = m_imgMgr->cur();
-        //TODO: 这段显示代码封函数
-        qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
-        if (pImgFile->m_isReady)
-            display(pImgFile->m_pImg.get());
-        else
-            display(m_imgLoading.get());
+        display(m_imgMgr->cur().get());
 
         isSucc = true;
     } while(0);
@@ -63,38 +60,12 @@ int CImgView::init(const QString &imgPath)
 
 int CImgView::displayPrev()
 {
-    auto pImgFile = m_imgMgr->prev();
-    qDebug() << "<-(display) " << pImgFile->m_info.absoluteFilePath();
-    if (pImgFile->m_isReady)
-        display(pImgFile->m_pImg.get());
-    else
-        display(m_imgLoading.get());
-
-    return 0;
+    return display(m_imgMgr->prev().get());
 }
 
 int CImgView::displayNext()
 {
-    auto pImgFile = m_imgMgr->next();
-    qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
-    if (pImgFile->m_isReady)
-        display(pImgFile->m_pImg.get());
-    else
-        display(m_imgLoading.get());
-
-    return 0;
-}
-
-void CImgView::onSigLoaded(QVariant var_file)
-{
-    if (!var_file.canConvert<QFileInfo>())
-        return;
-
-    auto file = var_file.value<QFileInfo>(); //TODO: 极端情况下, 仍然可能出现2个TImgFile所含file相同, 但pixmap*不同
-    auto curFile = m_imgMgr->cur();
-    if (curFile->m_info == file)
-        display(curFile->m_pImg.get());
-    return;
+    return display(m_imgMgr->next().get());
 }
 
 int CImgView::display(QPixmap *img)
@@ -102,6 +73,26 @@ int CImgView::display(QPixmap *img)
     QPixmap scaled = *img;
     m_displayPolicy->process(&scaled);
     ui->lbImg->setPixmap(scaled);
+    return 0;
+}
+
+int CImgView::display(tag_imgFile *pImgFile)
+{
+    qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
+    if (pImgFile->m_isReady)
+    {
+        display(pImgFile->m_pImg.get());
+        m_checkLoaded->stop();
+    }
+    else
+    {
+        static QPixmap loadingImg(":/res/img/loading.jpg");
+        display(&loadingImg);
+
+        //设置定时器, 每隔一段时间查看图片加载完成
+        if (!m_checkLoaded->isActive())
+            m_checkLoaded->start(INTERVAL_CHECK_IMG_LOADED_MS);
+    }
     return 0;
 }
 
@@ -124,4 +115,11 @@ void CImgView::keyPressEvent(QKeyEvent *ev)
     }
 
     return;
+}
+
+void CImgView:: updateIfLoaded()
+{
+    auto pImgFile = m_imgMgr->cur();
+    if (m_imgMgr->cur()->m_isReady)
+        display(pImgFile.get());    //缓存完毕, 更新图片
 }

@@ -14,9 +14,6 @@ public:
 
 public slots:
     void onSigLoadImg(QVariant var_pImgFile);
-
-signals:
-    void sigLoaded(QVariant var_file);
 };
 
 #endif // CIMGLOADER_H

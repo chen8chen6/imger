@@ -26,10 +26,8 @@ void CImgLoader::onSigLoadImg(QVariant var_pImgFile)
     pImgFile->m_isReady = true;
     auto cost_ms = duration_cast<milliseconds>(steady_clock::now() - start);
 
-    qDebug() << "loaded(" << cost_ms.count() << "ms): " << pImgFile->m_info.fileName();
-
-    //通知上层载入完毕
-    emit sigLoaded(QVariant::fromValue(pImgFile->m_info));
-
+    qDebug() << "loaded(" << cost_ms.count() << "ms): "
+             << pImgFile->m_info.fileName()
+             << pImgFile->m_pImg->size();
     return;
 }
