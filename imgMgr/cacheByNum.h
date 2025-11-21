@@ -15,14 +15,14 @@ public:
 
     QString name(void) const override {return "imgMgr: Cache by num";}
     int init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr) override;
-    TImgFile cur(void) const override { return *m_cur;}
-    TImgFile prev(void) override;
-    TImgFile next(void) override;
+    pImgFile_t cur(void) const override { return *m_cur;}
+    pImgFile_t prev(void) override;
+    pImgFile_t next(void) override;
 
 private:
     static constexpr int FORWARD_CACHE_SIZE = 10;   //向后缓存数量
     static constexpr int BACKWARD_CACHE_SIZE = 9;   //向前缓存数量
-    typedef std::list<TImgFile> cache_t;
+    typedef std::list<pImgFile_t> cache_t;    //应该插智能指针, 防止出cache后imgLoader还想改
 
 private:
     int cachePrev(QFileInfo file);

@@ -11,12 +11,12 @@ public:
 
     QString name(void) const override {return "imgMgr: Cache all";}
     int init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr) override;
-    TImgFile cur(void) const override;
-    TImgFile prev(void) override;
-    TImgFile next(void) override;
+    pImgFile_t cur(void) const override;
+    pImgFile_t prev(void) override;
+    pImgFile_t next(void) override;
 
 private:
-    typedef std::list<TImgFile> cache_t;
+    typedef std::list<pImgFile_t> cache_t;
     cache_t m_cache;        //缓存
     cache_t::iterator m_cur;//当前图片文件
 };

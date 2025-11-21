@@ -15,12 +15,16 @@ public:
 
     virtual QString name(void) const = 0;
     virtual int init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr) = 0;
-    virtual TImgFile cur(void) const = 0;
-    virtual TImgFile prev(void) = 0;
-    virtual TImgFile next(void) = 0;
+    virtual pImgFile_t cur(void) const = 0;
+    virtual pImgFile_t prev(void) = 0;
+    virtual pImgFile_t next(void) = 0;
+
+public slots:
+    void onSigLoaded(QVariant var_file);
 
 signals:
-    void sigLoadImg(QVariant var);
+    void sigLoadImg(QVariant var_pImgFile);
+    void sigLoaded(QVariant var_file);
 
 protected:
     int initImgLoaderThr(void);

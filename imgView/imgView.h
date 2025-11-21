@@ -2,7 +2,9 @@
 #define IMGVIEW_H
 
 #include <QDialog>
+#include <QVariant>
 #include <memory>   //std::shared_ptr
+
 
 namespace Ui {
 class CImgView;
@@ -25,6 +27,9 @@ public:
     int displayPrev(void);
     int displayNext(void);
 
+public slots:
+    void onSigLoaded(QVariant var_file);
+
 private:
     //显示
     int display(QPixmap *img);
@@ -41,8 +46,8 @@ private:
 private:
     Ui::CImgView *ui;
 
-    //std::shared_ptr<QPixmap> m_curImg = nullptr;
-    std::shared_ptr<CImgMgr> m_imgMgr = nullptr;               //图片缓存池
+    std::shared_ptr<QPixmap> m_imgLoading = nullptr;    //"loading"图片
+    std::shared_ptr<CImgMgr> m_imgMgr = nullptr;                //图片缓存池
     std::shared_ptr<CDisplayPolicy> m_displayPolicy = nullptr;  //图片显示状态
     struct {
         int m_centerX = 0;          //当前焦点

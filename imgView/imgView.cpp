@@ -29,28 +29,24 @@ int CImgView::init(const QString &imgPath)
         if (0 != fileMgr->init(imgPath))
             break;
 
-        //图片缓冲
+        //图片管理
+        m_imgLoading.reset(new QPixmap(":/res/img/loading.jpg"));
         m_imgMgr = CImgMgrFac::create(fileMgr->size());
         if (0 != m_imgMgr->init(imgPath, fileMgr))
             break;
+        connect(m_imgMgr.get(), &CImgMgr::sigLoaded, this, &CImgView::onSigLoaded);
 
         //显示策略
         m_displayPolicy.reset(new CRealSize);
 
         //显示图片
-        auto imgFile = m_imgMgr->cur();
-        if (nullptr == imgFile.m_pImg
-                || imgFile.m_pImg->isNull())
-        {
-            qDebug() << "invalid img: " << imgFile.m_info.absoluteFilePath();
-            break;
-        }
-
-        if (0 != display(imgFile.m_pImg.get()))
-        {
-            qDebug() << "display img faild: " << imgFile.m_info.absoluteFilePath();
-            break;
-        }
+        auto pImgFile = m_imgMgr->cur();
+        //TODO: 这段显示代码封函数
+        qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
+        if (pImgFile->m_isReady)
+            display(pImgFile->m_pImg.get());
+        else
+            display(m_imgLoading.get());
 
         isSucc = true;
     } while(0);
@@ -67,20 +63,38 @@ int CImgView::init(const QString &imgPath)
 
 int CImgView::displayPrev()
 {
-    auto imgFile = m_imgMgr->prev();
-    qDebug() << "<-(display) " << imgFile.m_info.absoluteFilePath();
-    std::unique_lock<std::mutex> locker(*(imgFile.m_mutex));
-    display(imgFile.m_pImg.get());
+    auto pImgFile = m_imgMgr->prev();
+    qDebug() << "<-(display) " << pImgFile->m_info.absoluteFilePath();
+    if (pImgFile->m_isReady)
+        display(pImgFile->m_pImg.get());
+    else
+        display(m_imgLoading.get());
+
     return 0;
 }
 
 int CImgView::displayNext()
 {
-    auto imgFile = m_imgMgr->next();
-    qDebug() << "(display)-> " << imgFile.m_info.absoluteFilePath();
-    std::unique_lock<std::mutex> locker(*(imgFile.m_mutex));
-    display(imgFile.m_pImg.get());
+    auto pImgFile = m_imgMgr->next();
+    qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
+    if (pImgFile->m_isReady)
+        display(pImgFile->m_pImg.get());
+    else
+        display(m_imgLoading.get());
+
     return 0;
+}
+
+void CImgView::onSigLoaded(QVariant var_file)
+{
+    if (!var_file.canConvert<QFileInfo>())
+        return;
+
+    auto file = var_file.value<QFileInfo>(); //TODO: 极端情况下, 仍然可能出现2个TImgFile所含file相同, 但pixmap*不同
+    auto curFile = m_imgMgr->cur();
+    if (curFile->m_info == file)
+        display(curFile->m_pImg.get());
+    return;
 }
 
 int CImgView::display(QPixmap *img)

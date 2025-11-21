@@ -4,8 +4,7 @@
 |                  CImgView
 |                负责显示图像
 --------------------------------------------------
-| - m_cache: CImgCache * = nullptr
-| - m_curImg: QPixmap * = nullptr
+| - m_imgMgr: CImgMgr * = nullptr
 | - m_displayPolicy : CDisplayPolicy * = nullptr
 | - m_displaySt: TDisplaySt
 --------------------------------------------------
@@ -13,6 +12,7 @@
 | + display(imgPath) : int
 | + displayPrev(void) : int
 | + displayNext(void) : int
+| + onSigLoaded(file: var) : void
 | - display(img:QPixmap *) : int
 | - moveVisableArea(dx:int, dy:int) : int
 | - zoom(percent:int) : int {percent = 1~1000}
@@ -26,17 +26,19 @@
 | ~ m_imgLoaderThr: QThread {读图动作单开一个线程}
 --------------------------------------------------
 | + init(imgPath: QString, fileMgr: CFileMgr*) : int
-| + cur(void) : TImgFile
-| + prev(void) : TImgFile
-| + next(void) : TImgFile
-| + sigLoadImg(imgFile: var) : void
+| + cur(void) : pImgFile_t
+| + prev(void) : pImgFile_t
+| + next(void) : pImgFile_t
+| + sigLoadImg(pImgFile: var) : void
 --------------------------------------------------
 
 --------------------------------------------------
 |              CImgLoader
 |             负责读取图片
 --------------------------------------------------
-| + onSigLoadImg(imgFile: var) : void { 信号槽 }
+| + sigLoaded(file: var)
+--------------------------------------------------
+| + onSigLoadImg(pImgFile: var) : void { 信号槽 }
 --------------------------------------------------
 
 --------------------------------------------------
@@ -67,8 +69,8 @@
 |         文件信息和已载入的图像数据
 --------------------------------------------------
 | + m_info: QFileInfo
-| + m_img: QPixmap*
-| + m_mutex: mutex*
+| + m_pImg: QPixmap*
+| + m_isReady: atomic_bool
 --------------------------------------------------
 
 --------------------------------------------------

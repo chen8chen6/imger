@@ -13,6 +13,11 @@ CImgMgr::~CImgMgr()
 
 }
 
+void CImgMgr::onSigLoaded(QVariant var_file)
+{
+    emit sigLoaded(var_file);
+}
+
 int CImgMgr::initImgLoaderThr()
 {
     //读图线程
@@ -20,6 +25,7 @@ int CImgMgr::initImgLoaderThr()
     imgLoader->moveToThread(&m_imgLoaderThr);
     connect(&m_imgLoaderThr, &QThread::finished, imgLoader, &QObject::deleteLater);
     connect(this, &CImgMgr::sigLoadImg, imgLoader, &CImgLoader::onSigLoadImg);
+    connect(imgLoader, &CImgLoader::sigLoaded, this, &CImgMgr::onSigLoaded);    //TODO: 优化信号传递路径
     m_imgLoaderThr.start();
     return 0;
 }

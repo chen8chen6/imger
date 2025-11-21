@@ -24,6 +24,7 @@ SOURCES += \
     imgMgr/cacheAll.cpp \
     imgMgr/cacheByNum.cpp \
     imgMgr/imgLoader.cpp \
+    imgType.cpp \
     imgView/displayPolocy.cpp \
     fileMgr/fileMgr.cpp \
     imgMgr/imgMgr.cpp \
@@ -47,3 +48,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res/res.qrc
