@@ -31,12 +31,6 @@ private:
     int display(QPixmap *img);
     int display(tag_imgFile * pImgFile);
 
-    //移动
-    int moveVisableArea(const int dx, const int dy);
-
-    //缩放
-    int zoom(const int percent);
-
     //键盘事件响应
     void keyPressEvent(QKeyEvent *ev) override;
 
@@ -51,11 +45,6 @@ private:
     QTimer * m_checkLoaded = nullptr;   //每隔一段时间检查图片是否加载完成
     std::shared_ptr<CImgMgr> m_imgMgr = nullptr;                //图片缓存池
     std::shared_ptr<CDisplayPolicy> m_displayPolicy = nullptr;  //图片显示状态
-    struct {
-        int m_centerX = 0;          //当前焦点
-        int m_centerY = 0;
-        int m_zoomPercent = 100;    //当前缩放倍率
-    } m_curSt;                  //显示状态
 
 };
 

@@ -28,6 +28,7 @@ SOURCES += \
     imgView/displayPolocy.cpp \
     fileMgr/fileMgr.cpp \
     imgMgr/imgMgr.cpp \
+    imgView/imgDspArea.cpp \
     imgView/imgView.cpp \
     main.cpp
 
@@ -39,6 +40,7 @@ HEADERS += \
     fileMgr/fileMgr.h \
     imgMgr/imgMgr.h \
     imgType.h \
+    imgView/imgDspArea.h \
     imgView/imgView.h
 
 FORMS += \

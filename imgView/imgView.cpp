@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QScrollBar>
 #include "displayPolocy.h"
 #include "imgMgr.h"
 #include "fileMgr.h"
@@ -14,6 +15,9 @@ CImgView::CImgView(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->scrollArea->setLbImg(ui->lbImg);
+
+//    ui->lbImg->hide();
     //图片载入完成时, 进行更新
     m_checkLoaded = new QTimer(this);
     connect(m_checkLoaded, &QTimer::timeout, this, &CImgView:: updateIfLoaded);
@@ -72,7 +76,8 @@ int CImgView::display(QPixmap *img)
 {
     QPixmap scaled = *img;
     m_displayPolicy->process(&scaled);
-    ui->lbImg->setPixmap(scaled);
+//    ui->lbImg->setPixmap(scaled);
+    ui->scrollArea->display(&scaled);
     return 0;
 }
 
@@ -101,7 +106,7 @@ void CImgView::keyPressEvent(QKeyEvent *ev)
     if (nullptr == ev)
         return;
 
-    qDebug() << "-----" << ev;
+    //qDebug() << "-----" << ev;
     switch (ev->key())
     {
     case Qt::Key_Z:

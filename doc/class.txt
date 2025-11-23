@@ -2,13 +2,12 @@
 
 --------------------------------------------------
 |                  CImgView
-|                负责显示图像
+|             负责显示和切换图像
 --------------------------------------------------
 | - INTERVAL_CHECK_IMG_LOADED_MS: int = 50 {检查图像是否载入完成的时间间隔}
 | - m_checkLoaded: QTimer * = nullptr {每隔一段时间检查图片是否加载完成}
 | - m_imgMgr: CImgMgr * = nullptr
 | - m_displayPolicy : CDisplayPolicy * = nullptr
-| - m_displaySt: TDisplaySt
 --------------------------------------------------
 | + init(imgPath:QString) : int
 | + display(imgPath) : int
@@ -16,9 +15,30 @@
 | + displayNext(void) : int
 | - display(img:QPixmap *) : int
 | - display(imgFile: pImgFile_t) : int
-| - moveVisableArea(dx:int, dy:int) : int
-| - zoom(percent:int) : int {percent = 1~1000}
 | - updateIfLoaded(void) : int
+--------------------------------------------------
+
+--------------------------------------------------
+|                CImgDspArea
+|          负责显示, 移动和缩放图像
+--------------------------------------------------
+| - ZOOM_MAX: int = 1000 {最大缩放倍率, 单位为%}
+| - ZOOM_MIN: int = 25
+| - m_curImg: QPixmap
+| - m_dspSt: TDisplaySt
+| - m_lbImg: QLabel*
+--------------------------------------------------
+| + setLbImg(lb: QLabel*) : void
+| + display(img: QPixmap*) : int
+| ~ event(ev: QEvent*) : bool {处理ScrollArea默认未处理的事件}
+| ~ keyPressEvent(ev: QKeyEvent*) : void 
+| ~ wheelEvent(ev: QWheelEvent) : void
+| - updateImgFocus(void) : void {更新图片焦点坐标}
+| - diff_topLeft2Center(void) : QPointF {显示区域左上角到中央的距离}
+| - resetDspSt(void) : void
+| - zoom(int percent) : int
+| - dspWidth(void) : int {dspArea的宽高(不包括边框和滚动条)}
+| - dspHeight(void) : int
 --------------------------------------------------
 
 --------------------------------------------------
@@ -77,7 +97,6 @@
 |                TDisplaySt
 |         当前显示图片的显示状态
 --------------------------------------------------
-| + m_focusX: int {屏幕中央在图片中的坐标}
-| + m_focusY: int
+| + m_focus: QPointf {屏幕中央在图片中的坐标}
 | + m_zoomPercent: int {放大倍率}
 --------------------------------------------------
