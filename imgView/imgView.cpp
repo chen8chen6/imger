@@ -4,8 +4,6 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QTimer>
-#include <QScrollBar>
-#include "displayPolocy.h"
 #include "imgMgr.h"
 #include "fileMgr.h"
 
@@ -16,11 +14,11 @@ CImgView::CImgView(QWidget *parent) :
     ui->setupUi(this);
 
     ui->scrollArea->setLbImg(ui->lbImg);
+    ui->scrollArea->setDspStrategy(CImgDspArea::DSP_STRATEGY::RealSize);
 
-//    ui->lbImg->hide();
     //图片载入完成时, 进行更新
     m_checkLoaded = new QTimer(this);
-    connect(m_checkLoaded, &QTimer::timeout, this, &CImgView:: updateIfLoaded);
+    connect(m_checkLoaded, &QTimer::timeout, this, &CImgView::updateIfLoaded);
 }
 
 CImgView::~CImgView()
@@ -28,23 +26,18 @@ CImgView::~CImgView()
     delete ui;
 }
 
-int CImgView::init(const QString &imgPath)
+int CImgView::init(const QString &filePath)
 {
     bool isSucc = false;
     do {
-        //文件管理
-        std::shared_ptr<CFileMgr> fileMgr(new CFileMgr);
-        //TODO: 设置filter, order等
-        if (0 != fileMgr->init(imgPath))
-            break;
-
         //图片管理
-        m_imgMgr = CImgMgrFac::create(fileMgr->size());
-        if (0 != m_imgMgr->init(imgPath, fileMgr))
+        //如果返回空指针,代表初始化失败
+        m_imgMgr = CImgMgrFac::create(filePath, QDir::SortFlags(QDir::Name | QDir::IgnoreCase));
+        if (nullptr == m_imgMgr)
             break;
 
-        //显示策略
-        m_displayPolicy.reset(new CRealSize);
+        //设置显示策略
+        ui->scrollArea->setDspStrategy(CImgDspArea::DSP_STRATEGY::FitWin);
 
         //显示图片
         display(m_imgMgr->cur().get());
@@ -56,7 +49,6 @@ int CImgView::init(const QString &imgPath)
     {
         //释放资源
         m_imgMgr.reset();
-        m_displayPolicy.reset();
     }
 
     return isSucc ? 0: -1;
@@ -75,8 +67,6 @@ int CImgView::displayNext()
 int CImgView::display(QPixmap *img)
 {
     QPixmap scaled = *img;
-    m_displayPolicy->process(&scaled);
-//    ui->lbImg->setPixmap(scaled);
     ui->scrollArea->display(&scaled);
     return 0;
 }

@@ -12,21 +12,21 @@ CFileMgr::~CFileMgr()
 
 }
 
-int CFileMgr::init(const QString &imgPath)
+int CFileMgr::init(const QString &filePath, const QDir &dir)
 {
     bool isSucc = false;
     do
     {
-        qDebug() << imgPath;
-        QFileInfo imgFile(imgPath);
-        if (!imgFile.exists())
-            break;  //文件不存在
+        qDebug() << filePath;
 
         //读取文件列表
-        QDir dir(imgFile.absolutePath());
-        static const QList<QString> imgSuffix = {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp"};
-        m_fileList = dir.entryInfoList(imgSuffix, QDir::Files, QDir::Name);
+        m_fileList = dir.entryInfoList();
         if (0 == m_fileList.size())
+            break;
+
+        //文件不存在或不是支持的图片格式
+        QFileInfo imgFile(filePath);
+        if (!exist(imgFile))
             break;
 
         isSucc = true;

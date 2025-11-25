@@ -19,21 +19,25 @@
 ----------------------------------
 #endif
 
-
 #include <QScrollArea>
+#include <memory>   //std::shared_ptr
 
-//TODO: 把pix, evHandler都放到这个类里处理
 class QLabel;
 class QScrollBar;
-
+class CDspStrategy;
 class CImgDspArea : public QScrollArea
 {
     Q_OBJECT
+
+public:
+    enum class DSP_STRATEGY {RealSize = 0, FitWin,};    //图片显示策略
+
 public:
     CImgDspArea(QWidget *parent = nullptr);
     ~CImgDspArea() override {}
 
     void setLbImg(QLabel *lb) {m_lbImg = lb;}
+    void setDspStrategy(const DSP_STRATEGY strategy);
     int display(QPixmap *img);
 
 protected:
@@ -43,15 +47,14 @@ protected:
     void keyPressEvent(QKeyEvent *ev) override;
     void wheelEvent(QWheelEvent *ev) override;
 
+    void resizeEvent(QResizeEvent *ev) override;
+
 private:
     //更新图片焦点
     void updateImgFocus(void);
 
     //显示区域左上角到中央的距离
     QPointF diff_topLeft2Center(void) const;
-
-    //复位显示状态
-    void resetDspSt(void);
 
     //缩放
     int zoom(int percent);  //percent = [ZOOM_MIN, ZOOM_MAX]
@@ -69,12 +72,15 @@ private:
 
     QScrollBar * hScroll = nullptr;     //水平滚动条
     QScrollBar * vScroll = nullptr;     //垂直滚动条
-
     QLabel *m_lbImg = nullptr;      //用来显示图片的组件
     QPixmap m_curImg;       //原始图片
 
+    //图片显示策略
+    std::shared_ptr<CDspStrategy> m_dspStrategy = nullptr;
+    DSP_STRATEGY m_curDspStrategy = DSP_STRATEGY::RealSize;
+
     struct {
-        QPointF m_focus = QPointF(0,0); //图片焦点, 即图片显示在dspArea正中的像素点坐标
+        QPointF m_focus = QPointF(0.0, 0.0); //图片焦点, 即图片显示在dspArea正中的像素点坐标
         int m_zoom_percent = 100;       //缩放倍率, 100表示100%
     } m_dspSt;  //图片展示参数    //TODO: rename->imgCfg?
 };

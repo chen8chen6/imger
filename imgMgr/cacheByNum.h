@@ -22,7 +22,7 @@ public:
 private:
     static constexpr int FORWARD_CACHE_SIZE = 10;   //向后缓存数量
     static constexpr int BACKWARD_CACHE_SIZE = 9;   //向前缓存数量
-    typedef std::list<pImgFile_t> cache_t;    //应该插智能指针, 防止出cache后imgLoader还想改
+    typedef std::list<pImgFile_t> cache_t;
 
 private:
     int cachePrev(QFileInfo file);

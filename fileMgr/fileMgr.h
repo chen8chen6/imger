@@ -9,7 +9,7 @@ public:
     CFileMgr();
     virtual ~CFileMgr();
 
-    int init(const QString &imgPath);
+    int init(const QString &filePath, const QDir &dir);
     QFileInfoList::size_type size(void) const {return m_fileList.size();}
     bool exist(const QFileInfo &file) const;
 

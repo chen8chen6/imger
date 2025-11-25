@@ -10,7 +10,6 @@ class CImgView;
 
 //class QPixmap;
 class CImgMgr;
-class CDisplayPolicy;
 struct tag_imgFile;
 
 class CImgView : public QDialog
@@ -20,7 +19,7 @@ class CImgView : public QDialog
 public:
     explicit CImgView(QWidget *parent = nullptr);
     ~CImgView() override;
-    int init(const QString &imgPath);
+    int init(const QString &filePath);
 
     //显示图片
     int displayPrev(void);
@@ -44,7 +43,6 @@ private:
 
     QTimer * m_checkLoaded = nullptr;   //每隔一段时间检查图片是否加载完成
     std::shared_ptr<CImgMgr> m_imgMgr = nullptr;                //图片缓存池
-    std::shared_ptr<CDisplayPolicy> m_displayPolicy = nullptr;  //图片显示状态
 
 };
 

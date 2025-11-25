@@ -25,9 +25,9 @@ SOURCES += \
     imgMgr/cacheByNum.cpp \
     imgMgr/imgLoader.cpp \
     imgType.cpp \
-    imgView/displayPolocy.cpp \
     fileMgr/fileMgr.cpp \
     imgMgr/imgMgr.cpp \
+    imgView/dspStrategy.cpp \
     imgView/imgDspArea.cpp \
     imgView/imgView.cpp \
     main.cpp
@@ -36,10 +36,10 @@ HEADERS += \
     imgMgr/cacheAll.h \
     imgMgr/cacheByNum.h \
     imgMgr/imgLoader.h \
-    imgView/displayPolocy.h \
     fileMgr/fileMgr.h \
     imgMgr/imgMgr.h \
     imgType.h \
+    imgView/dspStrategy.h \
     imgView/imgDspArea.h \
     imgView/imgView.h
 

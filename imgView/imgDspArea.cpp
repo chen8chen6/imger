@@ -7,6 +7,7 @@
 #include <QWheelEvent>
 #include <QLabel>
 #include <QScrollBar>
+#include "dspStrategy.h"
 
 using std::chrono::steady_clock;
 using std::chrono::duration_cast;
@@ -21,12 +22,37 @@ CImgDspArea::CImgDspArea(QWidget *parent)
     vScroll = verticalScrollBar();
 }
 
+void CImgDspArea::setDspStrategy(const CImgDspArea::DSP_STRATEGY strategy)
+{
+    m_curDspStrategy = strategy;
+    switch (strategy)
+    {
+    case DSP_STRATEGY::RealSize:
+        m_dspStrategy.reset(new CRealSize);
+        break;
+    case DSP_STRATEGY::FitWin:
+        m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));    //TODO: resize时要重新设置尺寸
+        break;
+    default:
+        break;
+    }
+    return;
+}
+
 int CImgDspArea::display(QPixmap *img)
 {
     m_curImg = *img;
-    //TODO: dspPolicy.process
-    m_lbImg->setPixmap(m_curImg);
-    resetDspSt();
+    QPixmap scaled = *img;
+    m_dspStrategy->process(&scaled);
+    m_lbImg->setPixmap(scaled);
+
+    //更新显示状态
+    m_dspSt.m_focus = QPoint(0, 0) + diff_topLeft2Center();
+    m_dspSt.m_zoom_percent = m_curImg.width() > 0 ? scaled.width() / m_curImg.width() : 100;
+
+    //调整定位
+    hScroll->setValue(0);
+    vScroll->setValue(0);
     return 0;
 }
 
@@ -41,11 +67,15 @@ bool CImgDspArea::event(QEvent *ev)
         switch (keyEv->key())
         {
         case Qt::Key_Plus:
-            zoom(std::min(1000, m_dspSt.m_zoom_percent + 25));
+            zoom(std::min(int(ZOOM_MAX), m_dspSt.m_zoom_percent + 25)); //std::min需要 & 入参, 但 constexpr是没有地址的
             isProcessed = true;
             break;
         case Qt::Key_Minus:
-            zoom(std::max(10, m_dspSt.m_zoom_percent - 25));
+            zoom(std::max(int(ZOOM_MIN), m_dspSt.m_zoom_percent - 25));
+            isProcessed = true;
+            break;
+        case Qt::Key_Equal:
+            zoom(100);      //原始大小
             isProcessed = true;
             break;
         case Qt::Key_Space:
@@ -56,6 +86,7 @@ bool CImgDspArea::event(QEvent *ev)
         }
     }
 
+    //TODO: 功能执行体放到keyPressEvent里执行, 这里只宣布接收该事件
     if (isProcessed)
         ev->accept();   //不再送到上层处理
 
@@ -70,6 +101,7 @@ void CImgDspArea::keyPressEvent(QKeyEvent *ev)
     QScrollArea::keyPressEvent(ev);
 
     //方向键或翻页键
+    //TODO: 更新焦点拿去和scrollbar的valueChanged信号连接会不会更好点?
     std::set<int> arrowKeys { Qt::Key_Left, Qt::Key_Right, Qt::Key_Up,
                                 Qt::Key_Down, Qt::Key_PageUp, Qt::Key_PageDown };
     const bool isArrowKey = (0 != arrowKeys.count(ev->key()));
@@ -83,6 +115,23 @@ void CImgDspArea::wheelEvent(QWheelEvent *ev)
 {
     QScrollArea::wheelEvent(ev);    //执行默认操作
     updateImgFocus();    //更新图片焦点
+    return;
+}
+
+void CImgDspArea::resizeEvent(QResizeEvent *ev)
+{
+    QScrollArea::resizeEvent(ev);
+
+    //TODO: 焦点, 定位需要更新
+
+    //更新"占满窗口"的尺寸
+    //TODO: 理论上应该有更好的判断当前显示策略的方式
+    qDebug() << __FUNCTION__ << ev->oldSize() << "->" << ev->size();
+     if (DSP_STRATEGY::FitWin == m_curDspStrategy)
+     {
+        m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));
+     }
+
     return;
 }
 
@@ -114,17 +163,6 @@ QPointF CImgDspArea::diff_topLeft2Center() const
     const qreal w = std::min(dspWidth(), imgSize.width());
     const qreal h = std::min(dspHeight(), imgSize.height());
     return QPointF((w-1)/2.0, (h-1)/2.0);
-}
-
-void CImgDspArea::resetDspSt()
-{
-    m_dspSt.m_focus = QPoint(0, 0) + diff_topLeft2Center();
-    m_dspSt.m_zoom_percent = 100;
-
-    hScroll->setValue(0);
-    vScroll->setValue(0);
-
-    return;
 }
 
 int CImgDspArea::zoom(int percent)

@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QVariant>
+#include <QDir> //QDir::SortFlag
 #include "imgType.h"
 
 class CFileMgr;
@@ -34,7 +35,7 @@ protected:
 class CImgMgrFac
 {
 public:
-    static std::shared_ptr<CImgMgr> create(int fileNum);
+    static std::shared_ptr<CImgMgr> create(const QString &filePath, QDir::SortFlags sorting);
 
 private:
     CImgMgrFac() = delete;
