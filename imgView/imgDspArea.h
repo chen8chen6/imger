@@ -41,13 +41,14 @@ public:
     int display(QPixmap *img);
 
 protected:
-    bool event(QEvent *ev) override;
-    //bool eventFilter(QObject *sender, QEvent *ev) override;
-
     void keyPressEvent(QKeyEvent *ev) override;
     void wheelEvent(QWheelEvent *ev) override;
-
     void resizeEvent(QResizeEvent *ev) override;
+
+private:
+    static constexpr int ZOOM_MAX = 1000;   //最大缩放倍率
+    static constexpr int ZOOM_MIN = 5;      //最小缩放倍率
+    enum class EV_HANDLER;  //事件处理方式
 
 private:
     //更新图片焦点
@@ -56,7 +57,12 @@ private:
     //显示区域左上角到中央的距离
     QPointF diff_topLeft2Center(void) const;
 
+    //移动可见范围
+    int moveSight(EV_HANDLER handler);
+    int moveSight(int dx, int dy);
+
     //缩放
+    int zoom(EV_HANDLER handler);
     int zoom(int percent);  //percent = [ZOOM_MIN, ZOOM_MAX]
     QPixmap scaleImg(int percent) const;
     qreal zoomCoord(const qreal Xm, const int percent, const int curZoom,
@@ -66,10 +72,9 @@ private:
     int dspWidth(void) const;
     int dspHeight(void) const;
 
-private:
-    static constexpr int ZOOM_MAX = 1000;   //最大缩放倍率
-    static constexpr int ZOOM_MIN = 25;     //最小缩放倍率
+    EV_HANDLER getKeyEvHandler(QKeyEvent *ev) const;
 
+private:
     QScrollBar * hScroll = nullptr;     //水平滚动条
     QScrollBar * vScroll = nullptr;     //垂直滚动条
     QLabel *m_lbImg = nullptr;      //用来显示图片的组件
@@ -83,6 +88,21 @@ private:
         QPointF m_focus = QPointF(0.0, 0.0); //图片焦点, 即图片显示在dspArea正中的像素点坐标
         int m_zoom_percent = 100;       //缩放倍率, 100表示100%
     } m_dspSt;  //图片展示参数    //TODO: rename->imgCfg?
+};
+
+enum class CImgDspArea::EV_HANDLER
+{
+    DoNothing = 0,
+    ScrollArea_Default, //调用QScrollArea的默认处理
+    LookUp_Slightly,
+    LookDown_Slightly,
+    LookLeft_Slightly,
+    LookRight_Slightly,
+    ZoomIn,
+    ZoomIn_Slightly,
+    ZoomOut,
+    ZoomOut_Slightly,
+    Reset_Zoom,
 };
 
 #endif // CIMGDSPAREA_H

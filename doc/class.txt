@@ -22,10 +22,13 @@
 |-------------------------------------------------
 | + DSP_STRATEGY: enum {RealSize, FitWin,};    //图片显示策略
 | - ZOOM_MAX: int = 1000 {最大缩放倍率, 单位为%}
-| - ZOOM_MIN: int = 25
+| - ZOOM_MIN: int = 5
+| - EV_HANDLER: enum {事件处理方式}
 | - m_curImg: QPixmap
 | - m_dspSt: TDisplaySt
 | - m_lbImg: QLabel*
+| - m_dspStrategy: CDspStrategy*
+| - m_curDspStrategy: DSP_STRATEGY {缩放至适合屏幕/实际大小}
 |-------------------------------------------------
 | + setLbImg(lb: QLabel*) : void
 | + display(img: QPixmap*) : int
@@ -35,9 +38,13 @@
 | ~ resizeEvent(ev: QResizeEvent*) : void
 | - updateImgFocus(void) : void {更新图片焦点坐标}
 | - diff_topLeft2Center(void) : QPointF {显示区域左上角到中央的距离}
+| - moveSight(handler: EV_HANDLER) : int
+| - moveSight(dx, dy) : int
+| - zoom(handler: EV_HANDLER) : int
 | - zoom(int percent) : int
 | - dspWidth(void) : int {dspArea的宽高(不包括边框和滚动条)}
 | - dspHeight(void) : int
+| - getKeyEvHandler(ev: QKeyEvent*) : EV_HANDLER {根据按键事件类型, 挑选处理事件的方式}
  -------------------------------------------------
 
  -------------------------------------------------
