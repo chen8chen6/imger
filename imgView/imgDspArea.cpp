@@ -13,7 +13,6 @@ using std::chrono::steady_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-
 CImgDspArea::CImgDspArea(QWidget *parent)
     : QScrollArea(parent)
 {
@@ -63,6 +62,8 @@ void CImgDspArea::keyPressEvent(QKeyEvent *ev)
     EV_HANDLER evHandler = getKeyEvHandler(ev);
     if (EV_HANDLER::DoNothing != evHandler)
         ev->accept();   //已处理的事件不再向上层传递
+    else
+        ev->ignore();
 
     //处理事件
     switch (evHandler)
@@ -96,6 +97,11 @@ void CImgDspArea::keyPressEvent(QKeyEvent *ev)
 
 void CImgDspArea::wheelEvent(QWheelEvent *ev)
 {
+    QPoint pix = ev->pixelDelta();
+    QPoint angle= ev->angleDelta();
+
+    qDebug() << "dspArea" << ev << pix << angle;
+
     QScrollArea::wheelEvent(ev);    //执行默认操作
     updateImgFocus();    //更新图片焦点
     return;
@@ -299,9 +305,9 @@ int CImgDspArea::dspHeight() const
     return vScroll->pageStep();
 }
 
-CImgDspArea::EV_HANDLER CImgDspArea::getKeyEvHandler(QKeyEvent *ev) const
+CImgDspArea::EV_HANDLER CImgDspArea::getKeyEvHandler(const QKeyEvent *ev)
 {
-    const std::map<std::pair<int, int>, EV_HANDLER> handlerMap
+    static const std::map<std::pair<int, int>, EV_HANDLER> handlerMap
     {
         //移动可见区域
         {{Qt::Key_Up,   Qt::NoModifier},        EV_HANDLER::ScrollArea_Default},

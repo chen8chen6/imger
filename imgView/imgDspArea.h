@@ -51,6 +51,8 @@ private:
     enum class EV_HANDLER;  //事件处理方式
 
 private:
+    static EV_HANDLER getKeyEvHandler(const QKeyEvent *ev);
+
     //更新图片焦点
     void updateImgFocus(void);
 
@@ -71,8 +73,6 @@ private:
     //dspArea的宽高(不包括边框和滚动条)
     int dspWidth(void) const;
     int dspHeight(void) const;
-
-    EV_HANDLER getKeyEvHandler(QKeyEvent *ev) const;
 
 private:
     QScrollBar * hScroll = nullptr;     //水平滚动条

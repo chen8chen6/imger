@@ -96,7 +96,7 @@ void CImgView::keyPressEvent(QKeyEvent *ev)
     if (nullptr == ev)
         return;
 
-    //qDebug() << "-----" << ev;
+    qDebug() << "imgView:" << ev;
     switch (ev->key())
     {
     case Qt::Key_Z:
