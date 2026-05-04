@@ -103,28 +103,31 @@ bool CFileMgr::sortByPrefixAndIdx(const QFileInfo &l, const QFileInfo &r)
     QString lName = l.fileName(), lPrefix, lIdx, lRemain;
     QString rName = r.fileName(), rPrefix, rIdx, rRemain;
 
+    //将文件名反复拆分成[前缀][序号][其余部分]
     do
     {
-        divide(lName, lPrefix, lIdx, lRemain);
-        divide(rName, rPrefix, rIdx, rRemain);
+        split(lName, lPrefix, lIdx, lRemain);
+        split(rName, rPrefix, rIdx, rRemain);
 
+        if (lPrefix != rPrefix || lIdx != rIdx)
+            break;
+
+        //前缀和序号一致, 则继续拆分字符串
         lName = lRemain;
         rName = rRemain;
-
-        if (lPrefix == rPrefix && lIdx == rIdx)
-            continue;   //完全一致则进入下一轮对比
-        else
-            return (lPrefix < rPrefix)
-                    || (lIdx.toInt() < rIdx.toInt())
-                    || (lIdx < rIdx);   //数值一致则按字符串对比
-
     } while (!lRemain.isEmpty() && !rRemain.isEmpty());
 
-    //前缀完全一致, 则短字符串优先
-    return lRemain.isEmpty();
+    if (lPrefix == rPrefix && lIdx == rIdx)
+        return lRemain.isEmpty() && !rRemain.isEmpty(); //前缀和序号完全一致, 则短字符串优先
+    else if (lPrefix != rPrefix)
+        return lPrefix < rPrefix;   //对比前缀
+    else
+        return (lIdx.toInt() == rIdx.toInt())    //对比序号
+            ? lIdx < rIdx   //数值一致则按字符串对比
+            : lIdx.toInt() < rIdx.toInt();
 }
 
-void CFileMgr::divide(const QString &origin, QString &prefix, QString &idx, QString &remain)
+void CFileMgr::split(const QString &origin, QString &prefix, QString &idx, QString &remain)
 {
     //(n个non-digit)(n个digit)(其余部分)
     static const QRegularExpression mask{R"(^(?<prefix>\D*)(?<index>\d*)(?<remain>.*)$)"};
@@ -138,10 +141,10 @@ void CFileMgr::divide(const QString &origin, QString &prefix, QString &idx, QStr
     }
     else
     {
-        prefix.clear();
+        prefix = origin;
         idx.clear();
         remain.clear();
-        qDebug() << "warn: parse [" << origin << "] failed";
+        qDebug() << "warn: parse [" << origin << "] failed";    //理论上不可能发生
     }
 
     return;
