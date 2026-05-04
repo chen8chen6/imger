@@ -22,6 +22,10 @@ public:
     QFileInfoList allFiles(void) {return m_fileList;}
 
 private:
+    //按前缀+序号的方式排序, 处理按文件名排序时出现10.jpg插入1.jpg和2.jpg之间的问题
+    static bool sortByPrefixAndIdx(const QFileInfo &l, const QFileInfo &r);
+    static void divide(const QString &origin, QString &prefix, QString &idx, QString &remain);
+
     //查找指定文件在列表中的位置
     //QFileInfoList::iterator fileIter(const QFileInfo &file);
     QFileInfoList::const_iterator fileConstIter(const QFileInfo &file) const;

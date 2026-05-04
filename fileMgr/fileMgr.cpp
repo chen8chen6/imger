@@ -1,6 +1,8 @@
 #include "fileMgr.h"
+#include <algorithm>    //std::sort
 #include <QDebug>
 #include <QDir>
+#include <QRegularExpression>
 
 CFileMgr::CFileMgr()
 {
@@ -28,6 +30,12 @@ int CFileMgr::init(const QString &filePath, const QDir &dir)
         QFileInfo imgFile(filePath);
         if (!exist(imgFile))
             break;
+
+        //文件名中的阿拉伯数字串需要按数值大小排序而不是按字符排序
+        if (QDir::SortFlag::Name == (dir.sorting() & 0x03))
+        {
+            std::sort(m_fileList.begin(), m_fileList.end(), sortByPrefixAndIdx);
+        }
 
         isSucc = true;
     } while(0);
@@ -87,6 +95,56 @@ QFileInfoList CFileMgr::nFilesAfter(int n, const QFileInfo &file)
     }
 
     return ret;
+}
+
+bool CFileMgr::sortByPrefixAndIdx(const QFileInfo &l, const QFileInfo &r)
+{
+    //TODO: 输入的是一定程度排序后的数组, 相似名称的元素会聚到一起, 理论上应该可以加速
+    QString lName = l.fileName(), lPrefix, lIdx, lRemain;
+    QString rName = r.fileName(), rPrefix, rIdx, rRemain;
+
+    do
+    {
+        divide(lName, lPrefix, lIdx, lRemain);
+        divide(rName, rPrefix, rIdx, rRemain);
+
+        lName = lRemain;
+        rName = rRemain;
+
+        if (lPrefix == rPrefix && lIdx == rIdx)
+            continue;   //完全一致则进入下一轮对比
+        else
+            return (lPrefix < rPrefix)
+                    || (lIdx.toInt() < rIdx.toInt())
+                    || (lIdx < rIdx);   //数值一致则按字符串对比
+
+    } while (!lRemain.isEmpty() && !rRemain.isEmpty());
+
+    //前缀完全一致, 则短字符串优先
+    return lRemain.isEmpty();
+}
+
+void CFileMgr::divide(const QString &origin, QString &prefix, QString &idx, QString &remain)
+{
+    //(n个non-digit)(n个digit)(其余部分)
+    static const QRegularExpression mask{R"(^(?<prefix>\D*)(?<index>\d*)(?<remain>.*)$)"};
+
+    auto match = mask.match(origin);
+    if (match.hasMatch())
+    {
+        prefix = match.captured("prefix");
+        idx = match.captured("index");
+        remain = match.captured("remain");
+    }
+    else
+    {
+        prefix.clear();
+        idx.clear();
+        remain.clear();
+        qDebug() << "warn: parse [" << origin << "] failed";
+    }
+
+    return;
 }
 
 /*QFileInfoList::iterator CFileMgr::fileIter(const QFileInfo &file)

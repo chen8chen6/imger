@@ -71,12 +71,15 @@ void CImgDspArea::keyPressEvent(QKeyEvent *ev)
     //移动可见区域
     case EV_HANDLER::ScrollArea_Default:
         QScrollArea::keyPressEvent(ev); //TODO: 除了方向键和pageUp/Down, QScrollArea是否还默认接收别的按键事件?
+        updateImgFocus();   //更新图片焦点
+        break;
+
     case EV_HANDLER::LookUp_Slightly:
     case EV_HANDLER::LookDown_Slightly:
     case EV_HANDLER::LookLeft_Slightly:
     case EV_HANDLER::LookRight_Slightly:
         moveSight(evHandler);
-        updateImgFocus();   //更新图片焦点
+        updateImgFocus();
         break;
 
     //缩放
@@ -111,15 +114,15 @@ void CImgDspArea::resizeEvent(QResizeEvent *ev)
 {
     QScrollArea::resizeEvent(ev);
 
-    //TODO: 焦点, 定位需要更新
-
-    //更新"占满窗口"的尺寸
     //TODO: 理论上应该有更好的判断当前显示策略的方式
     qDebug() << __FUNCTION__ << ev->oldSize() << "->" << ev->size();
      if (DSP_STRATEGY::FitWin == m_curDspStrategy)
      {
         m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));
      }
+
+     display(&m_curImg);    //刷新当前图片显示
+     updateImgFocus();      //更新焦点, 定位
 
     return;
 }

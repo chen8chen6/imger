@@ -18,6 +18,7 @@ int CCacheAll::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
     {
         //这个策略里, 缓存完成后只读不写
         pImgFile_t pImgFile(new TImgFile(file, pImg_t(new QPixmap(file.absoluteFilePath()))));
+        pImgFile->m_isReady = true;
         m_cache.push_back(std::move(pImgFile));
     }
 
