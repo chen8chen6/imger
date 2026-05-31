@@ -1,16 +1,38 @@
 cmake_minimum_required (VERSION 4.0)
 
 ##### 项目名称 #####
-project (Imger)
+set (PROJECT_NAME Imger)
+project (${PROJECT_NAME})
+
+##### 自动搜寻QT安装路径 #####
+if (WIN32)
+	#QT常见安装路径, 格式如: D:/Qt/Qt5.13.2/5.13.2/
+	file (GLOB COMMON_USED_QT_DIR_LIST
+		C:/Qt/Qt[56].*.*/[56].*.*
+		D:/Qt/Qt[56].*.*/[56].*.*
+		E:/Qt/Qt[56].*.*/[56].*.*)
+
+	foreach(COMMON_USED_DIR IN LISTS COMMON_USED_QT_DIR_LIST)
+		if (EXISTS ${COMMON_USED_DIR})
+			message(STATUS "QT dir found: " ${COMMON_USED_DIR})
+			set(CMAKE_PREFIX_PATH ${COMMON_USED_DIR}/msvc2017_64/)	#设置编译器路径
+			break()
+		endif()
+	endforeach()
+endif()						
+if ((NOT DEFINED CMAKE_PREFIX_PATH) OR (CMAKE_PREFIX_PATH STREQUAL ""))
+	message (FATAL_ERROR "QT dir not found! Add your QT dir to macro COMMON_USED_QT_DIR_LIST manually.")	#自动搜寻失败
+endif()
 
 ##### QT设置 #####
-set (CMAKE_PREFIX_PATH D:/Qt/Qt5.13.2/5.13.2/msvc2017_64/)	#TODO:改成自动搜寻
+#set (CMAKE_PREFIX_PATH D:/Qt/Qt5.13.2/5.13.2/msvc2017_64/)
 set (CMAKE_AUTOUIC ON)
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTORCC ON)
 
-find_package (QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)		#TODO: 组件名想办法改成只需要修改1次
-find_package (Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
+set (QT_COMPNENTS_REQUIRED Widgets Gui) #需要添加的Qt组件
+find_package (QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPNENTS_REQUIRED})
+find_package (Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPNENTS_REQUIRED})
 
 ##### 目录 #####
 set (DIR_FILE_MGR ${PROJECT_SOURCE_DIR}/fileMgr)
@@ -42,13 +64,12 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options (/utf-8)	#解决vs报"常量中有换行符"问题
 
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-ADD_EXECUTABLE(Imger main.cpp ${SRC_IMG_TYPE} ${SRC_FILE_MGR} ${SRC_IMG_MGR} ${SRC_IMG_VIEW})
+ADD_EXECUTABLE(${PROJECT_NAME} main.cpp ${SRC_IMG_TYPE} ${SRC_FILE_MGR} ${SRC_IMG_MGR} ${SRC_IMG_VIEW} ${PROJECT_SOURCE_DIR}/res/res.qrc)
 
 #连接动态库
-target_link_libraries(Imger Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui)
+foreach(COMP IN LISTS QT_COMPNENTS_REQUIRED)
+	list(APPEND QT_LIB_TO_LINK Qt${QT_VERSION_MAJOR}::${COMP})
+endforeach()
+target_link_libraries(${PROJECT_NAME} ${QT_LIB_TO_LINK})
 
 ##TODO: 把动态库从Qt目录下复制过来
-
-
-
-
