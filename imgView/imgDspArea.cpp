@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include "dspStrategy.h"
+#include "cfgMgr.h"
 
 using std::chrono::steady_clock;
 using std::chrono::duration_cast;
@@ -57,45 +58,67 @@ int CImgDspArea::display(QPixmap *img)
 
 void CImgDspArea::keyPressEvent(QKeyEvent *ev)
 {
-    qDebug() << "dspArea" << ev << ev->isAccepted();
+    qDebug() << "dspArea:" << ev << ev->isAccepted();
 
-    EV_HANDLER evHandler = getKeyEvHandler(ev);
-    if (EV_HANDLER::DoNothing != evHandler)
-        ev->accept();   //已处理的事件不再向上层传递
-    else
-        ev->ignore();
-
-    //处理事件
-    switch (evHandler)
+    keyHash_t keyHash = CCfgHelper::getKeyHash(ev);
+    const auto &dict = m_cfgMgr->getCfg()->imgView.keyUsageDict;
+    if (0 == dict.count(keyHash)
+        || !CCfgHelper::isImgUsage(dict.at(keyHash)))
     {
-    //移动可见区域
-    case EV_HANDLER::ScrollArea_Default:
-        QScrollArea::keyPressEvent(ev); //TODO: 除了方向键和pageUp/Down, QScrollArea是否还默认接收别的按键事件?
-        updateImgFocus();   //更新图片焦点
-        break;
+        ev->ignore();
+        return;
+    }
 
-    case EV_HANDLER::LookUp_Slightly:
-    case EV_HANDLER::LookDown_Slightly:
-    case EV_HANDLER::LookLeft_Slightly:
-    case EV_HANDLER::LookRight_Slightly:
-        moveSight(evHandler);
+    switch (dict.at(keyHash))
+    {
+    case Usage::ZoomIn:
+        zoom(std::min(static_cast<int>(ZOOM_MAX), m_dspSt.m_zoom_percent + 25));
+        break;
+    case Usage::ZoomOut:
+        zoom(std::max(static_cast<int>(ZOOM_MIN), m_dspSt.m_zoom_percent - 25));
+        break;
+    case Usage::ZoomReset:
+        zoom(100);  //原始大小
+        break;
+    case Usage::SightUp:
+        moveSight(0, 0 - dspHeight()/4);
         updateImgFocus();
         break;
-
-    //缩放
-    case EV_HANDLER::ZoomIn:
-    case EV_HANDLER::ZoomIn_Slightly:
-    case EV_HANDLER::ZoomOut:
-    case EV_HANDLER::ZoomOut_Slightly:
-    case EV_HANDLER::Reset_Zoom:
-        zoom(evHandler);
+    case Usage::SightDown:
+        moveSight(0, dspHeight()/4);
+        updateImgFocus();
         break;
-
-    case EV_HANDLER::DoNothing:
+    case Usage::SightLeft:
+        moveSight(0-dspWidth()/4, 0);
+        updateImgFocus();
+        break;
+    case Usage::SightRight:
+        moveSight(dspWidth()/4, 0);
+        updateImgFocus();
+        break;
+    case Usage::SightUp_1px:
+        moveSight(0, -1);
+        updateImgFocus();
+        break;
+    case Usage::SightDown_1px:
+        moveSight(0, 1);
+        updateImgFocus();
+        break;
+    case Usage::SightLeft_1px:
+        moveSight(-1, 0);
+        updateImgFocus();
+        break;
+    case Usage::SightRight_1px:
+        moveSight(1, 0);
+        updateImgFocus();
+        break;
     default:
+        //do nothing
         break;
     }
-   return;
+
+    ev->accept();
+    return;
 }
 
 void CImgDspArea::wheelEvent(QWheelEvent *ev)
@@ -156,29 +179,6 @@ QPointF CImgDspArea::diff_topLeft2Center() const
     const qreal h = std::min(dspHeight(), imgSize.height());
     return QPointF((w-1)/2.0, (h-1)/2.0);
 }
-
-int CImgDspArea::moveSight(CImgDspArea::EV_HANDLER handler)
-{
-    switch (handler)
-    {
-    case EV_HANDLER::LookUp_Slightly:
-        moveSight(0, -1);
-        break;
-    case EV_HANDLER::LookDown_Slightly:
-        moveSight(0, 1);
-        break;
-    case EV_HANDLER::LookLeft_Slightly:
-        moveSight(-1, 0);
-        break;
-    case EV_HANDLER::LookRight_Slightly:
-        moveSight(1, 0);
-        break;
-    default:
-        break;
-    }
-    return 0;
-}
-
 int CImgDspArea::moveSight(int dx, int dy)
 {
     if (0 != dx)
@@ -186,31 +186,6 @@ int CImgDspArea::moveSight(int dx, int dy)
     if (0 != dy)
         vScroll->setValue(vScroll->value() + dy);
 
-    return 0;
-}
-
-int CImgDspArea::zoom(CImgDspArea::EV_HANDLER handler)
-{
-    switch (handler)
-    {
-    case EV_HANDLER::ZoomIn:
-        zoom(std::min(static_cast<int>(ZOOM_MAX), m_dspSt.m_zoom_percent + 25));
-        break;
-    case EV_HANDLER::ZoomIn_Slightly:
-        zoom(std::min(static_cast<int>(ZOOM_MAX), m_dspSt.m_zoom_percent + 5));
-        break;
-    case EV_HANDLER::ZoomOut:
-        zoom(std::max(static_cast<int>(ZOOM_MIN), m_dspSt.m_zoom_percent - 25));
-        break;
-    case EV_HANDLER::ZoomOut_Slightly:
-        zoom(std::max(static_cast<int>(ZOOM_MIN), m_dspSt.m_zoom_percent - 5));
-        break;
-    case EV_HANDLER::Reset_Zoom:
-        zoom(100);
-        break;
-    default:
-        break;
-    }
     return 0;
 }
 
@@ -258,7 +233,7 @@ QPixmap CImgDspArea::scaleImg(int percent) const
 {
     //缩放当前图片
     auto start = steady_clock::now();
-    int curZoom = m_dspSt.m_zoom_percent;
+    int curZoom = m_dspSt.m_zoom_percent;   //TODO: 换成qreal提升精度?
     QPixmap scaled = m_curImg.scaled(m_curImg.size()*percent/100,
                                      Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation);
@@ -307,35 +282,4 @@ int CImgDspArea::dspHeight() const
 {
     return vScroll->pageStep();
 }
-
-CImgDspArea::EV_HANDLER CImgDspArea::getKeyEvHandler(const QKeyEvent *ev)
-{
-    static const std::map<std::pair<int, int>, EV_HANDLER> handlerMap
-    {
-        //移动可见区域
-        {{Qt::Key_Up,   Qt::NoModifier},        EV_HANDLER::ScrollArea_Default},
-        {{Qt::Key_Up,   Qt::ControlModifier},   EV_HANDLER::LookUp_Slightly},
-        {{Qt::Key_Down, Qt::NoModifier},        EV_HANDLER::ScrollArea_Default},
-        {{Qt::Key_Down, Qt::ControlModifier},   EV_HANDLER::LookDown_Slightly},
-        {{Qt::Key_Left, Qt::NoModifier},        EV_HANDLER::ScrollArea_Default},
-        {{Qt::Key_Left, Qt::ControlModifier},   EV_HANDLER::LookLeft_Slightly},
-        {{Qt::Key_Right,    Qt::NoModifier},    EV_HANDLER::ScrollArea_Default},
-        {{Qt::Key_Right,    Qt::ControlModifier}, EV_HANDLER::LookRight_Slightly},
-        {{Qt::Key_PageUp,   Qt::NoModifier},    EV_HANDLER::DoNothing},
-        {{Qt::Key_PageDown, Qt::NoModifier},    EV_HANDLER::DoNothing},
-
-        //缩放
-        {{Qt::Key_Plus,     Qt::NoModifier},    EV_HANDLER::ZoomIn},
-        {{Qt::Key_Plus,     Qt::ShiftModifier}, EV_HANDLER::ZoomIn},    //TODO: 我的键盘要输入'+'只能按'shift'+'=', 考虑到键盘布局, 是否要对其它类似按键进行兼容?
-        {{Qt::Key_Minus,    Qt::NoModifier},    EV_HANDLER::ZoomOut},
-        {{Qt::Key_Equal,    Qt::NoModifier},    EV_HANDLER::Reset_Zoom},
-    };
-
-    std::pair<int, int> key(ev->key(), ev->modifiers());
-
-    return handlerMap.count(key) > 0
-            ? handlerMap.at(key)
-            : EV_HANDLER::DoNothing;
-}
-
 

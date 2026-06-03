@@ -11,6 +11,7 @@ class CImgView;
 //class QPixmap;
 class CImgMgr;
 struct tag_imgFile;
+class CCfgMgr;
 
 class CImgView : public QDialog
 {
@@ -19,11 +20,14 @@ class CImgView : public QDialog
 public:
     explicit CImgView(QWidget *parent = nullptr);
     ~CImgView() override;
-    int init(const QString &filePath);
+    int init(const QString &filePath, const CCfgMgr *cfgMgr);
 
     //显示图片
     int displayPrev(void);
     int displayNext(void);
+
+private slots:
+    void  updateIfLoaded(void);
 
 private:
     //显示
@@ -33,9 +37,6 @@ private:
     //键盘事件响应
     void keyPressEvent(QKeyEvent *ev) override;
 
-private slots:
-    void  updateIfLoaded(void);
-
 private:
     static constexpr int INTERVAL_CHECK_IMG_LOADED_MS = 50; //检查图像是否载入完成的时间间隔
 
@@ -44,6 +45,7 @@ private:
     QTimer * m_checkLoaded = nullptr;   //每隔一段时间检查图片是否加载完成
     std::shared_ptr<CImgMgr> m_imgMgr = nullptr;                //图片缓存池
 
+    const CCfgMgr* m_cfgMgr = nullptr;
 };
 
 #endif // IMGVIEW_H

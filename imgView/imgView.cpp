@@ -4,8 +4,10 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QMessageBox>
 #include "imgMgr.h"
 #include "fileMgr.h"
+#include "cfgMgr.h"
 
 CImgView::CImgView(QWidget *parent) :
     QDialog(parent),
@@ -26,18 +28,31 @@ CImgView::~CImgView()
     delete ui;
 }
 
-int CImgView::init(const QString &filePath)
+int CImgView::init(const QString &filePath, const CCfgMgr* cfgMgr)
 {
     bool isSucc = false;
     do {
+        //载入设置
+        if (nullptr == cfgMgr)
+            break;
+        m_cfgMgr = cfgMgr;
+        auto cfg = m_cfgMgr->getCfg();
+
         //图片管理
         //如果返回空指针,代表初始化失败
-        m_imgMgr = CImgMgrFac::create(filePath, QDir::SortFlags(QDir::Name | QDir::IgnoreCase));
+        auto dspOrder = (0 == cfg->imgView.dspOrder)    //TODO: 使用枚举, 在imgMgr类的内部实际处理最终顺序
+            ? QDir::SortFlags(QDir::Name | QDir::IgnoreCase)
+            : QDir::SortFlags(QDir::Time);
+        m_imgMgr = CImgMgrFac::create(filePath, dspOrder);
         if (nullptr == m_imgMgr)
             break;
 
         //设置显示策略
-        ui->scrollArea->setDspStrategy(CImgDspArea::DSP_STRATEGY::FitWin);
+        auto dspStgy = (0 == cfg->imgView.dspStgy)
+            ? CImgDspArea::DSP_STRATEGY::RealSize   //TODO: 这个枚举再逻辑上与CImgDspArea并非强关联, 可以提升到更上层的位置
+            : CImgDspArea::DSP_STRATEGY::FitWin;
+        ui->scrollArea->init(cfgMgr);
+        ui->scrollArea->setDspStrategy(dspStgy);
 
         //显示图片
         display(m_imgMgr->cur().get());
@@ -97,18 +112,29 @@ void CImgView::keyPressEvent(QKeyEvent *ev)
         return;
 
     qDebug() << "imgView:" << ev;
-    switch (ev->key())
+    
+    keyHash_t keyHash = CCfgHelper::getKeyHash(ev);
+    const auto usageDict = m_cfgMgr->getCfg()->imgView.keyUsageDict;
+    if (0 == usageDict.count(keyHash))
+        return;
+
+    switch (usageDict.at(keyHash))
     {
-    case Qt::Key_Z:
-        displayPrev();
+    case Usage::Help:
+        QMessageBox::information(this, "F1", "Help here");
         break;
-    case Qt::Key_X:
+    case Usage::Next_Img:
         displayNext();
         break;
+    case Usage::Prev_Img:
+        displayPrev();
+        break;
     default:
+        //do Nothing
         break;
     }
 
+    ev->accept();
     return;
 }
 

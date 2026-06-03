@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "imgView.h"
+#include "cfgMgr.h"
 
 char** argv2Thin(int argc, wchar_t* argv[])
 {
@@ -45,10 +46,18 @@ int wmain(int argc, wchar_t *argv[])
     }
     const QString imgPath = QString::fromWCharArray(argv[1]);
 
+    //载入配置
+    CCfgMgr* cfg = CCfgMgr::getSingleton();
+    if (0 != cfg->load())
+    {
+        cfg->save();    //TODO:这个函数保存的是默认配置, 应该换个名字
+        cfg->load();
+    }
+
     //无框, 占满屏幕
     CImgView imgView;
     imgView.setWindowFlag(Qt::FramelessWindowHint, true);
-    if (0 != imgView.init(imgPath))
+    if (0 != imgView.init(imgPath, cfg))
     {
         QMessageBox::critical(nullptr, "错误", "初始化失败");
         return -1;

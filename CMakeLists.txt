@@ -30,7 +30,7 @@ set (CMAKE_AUTOUIC ON)
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTORCC ON)
 
-set (QT_COMPNENTS_REQUIRED Widgets Gui) #需要添加的Qt组件
+set (QT_COMPNENTS_REQUIRED Widgets Gui Xml) #需要添加的Qt组件
 find_package (QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPNENTS_REQUIRED})
 find_package (Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPNENTS_REQUIRED})
 
@@ -38,6 +38,7 @@ find_package (Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPNENTS_REQUIRED}
 set (DIR_FILE_MGR ${PROJECT_SOURCE_DIR}/fileMgr)
 set (DIR_IMG_MGR ${PROJECT_SOURCE_DIR}/imgMgr)
 set (DIR_IMG_VIEW ${PROJECT_SOURCE_DIR}/imgView)
+set (DIR_CFG ${PROJECT_SOURCE_DIR}/cfg)
 
 ##### 源文件 #####
 set (SRC_IMG_TYPE ${PROJECT_SOURCE_DIR}/imgType.h ${PROJECT_SOURCE_DIR}/imgType.cpp)
@@ -49,14 +50,18 @@ set (SRC_IMG_MGR ${DIR_IMG_MGR}/imgMgr.h ${DIR_IMG_MGR}/imgMgr.cpp
 set (SRC_IMG_VIEW ${DIR_IMG_VIEW}/imgView.h ${DIR_IMG_VIEW}/imgView.cpp ${DIR_IMG_VIEW}/imgView.ui
 		${DIR_IMG_VIEW}/imgDspArea.h ${DIR_IMG_VIEW}/imgDspArea.cpp
 		${DIR_IMG_VIEW}/dspStrategy.h ${DIR_IMG_VIEW}/dspStrategy.cpp)
+set (SRC_CFG ${DIR_CFG}/cfgDef.h ${DIR_CFG}/cfgDef.cpp
+		${DIR_CFG}/cfgMgr.h ${DIR_CFG}/cfgMgr.cpp
+		${DIR_CFG}/xmlHelper.h ${DIR_CFG}/xmlHelper.cpp)
 
 ##### 项目文件中的目录结构 #####
 source_group (fileMgr FILES ${SRC_FILE_MGR})
 source_group (imgMgr FILES ${SRC_IMG_MGR})
 source_group (imgView FILES ${SRC_IMG_VIEW})
+source_group (cfg FILES ${SRC_CFG})
 
 ##### 头文件包含目录 #####
-include_directories (${PROJECT_SOURCE_DIR} ${DIR_FILE_MGR} ${DIR_IMG_MGR} ${DIR_IMG_VIEW})
+include_directories (${PROJECT_SOURCE_DIR} ${DIR_FILE_MGR} ${DIR_IMG_MGR} ${DIR_IMG_VIEW} ${DIR_CFG})
 
 ##### 编译 #####
 set (CMAKE_CXX_STANDARD 17)
@@ -64,7 +69,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options (/utf-8)	#解决vs报"常量中有换行符"问题
 
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-ADD_EXECUTABLE(${PROJECT_NAME} main.cpp ${SRC_IMG_TYPE} ${SRC_FILE_MGR} ${SRC_IMG_MGR} ${SRC_IMG_VIEW} ${PROJECT_SOURCE_DIR}/res/res.qrc)
+ADD_EXECUTABLE(${PROJECT_NAME} main.cpp ${SRC_IMG_TYPE} ${SRC_FILE_MGR} ${SRC_IMG_MGR} ${SRC_IMG_VIEW} ${SRC_CFG} ${PROJECT_SOURCE_DIR}/res/res.qrc)
 
 #连接动态库
 foreach(COMP IN LISTS QT_COMPNENTS_REQUIRED)

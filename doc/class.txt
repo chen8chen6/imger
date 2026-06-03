@@ -7,8 +7,9 @@
 | - INTERVAL_CHECK_IMG_LOADED_MS: int = 50 {检查图像是否载入完成的时间间隔}
 | - m_checkLoaded: QTimer * = nullptr {每隔一段时间检查图片是否加载完成}
 | - m_imgMgr: CImgMgr * = nullptr
+| - m_cfgMgr : const CCfgMgr * = nullptr
 |-------------------------------------------------
-| + init(filePath: QString) : int
+| + init(filePath: QString, cfgMgr : const CCfgMgr *) : int
 | + displayPrev(void) : int
 | + displayNext(void) : int
 | - display(img: QPixmap*) : int
@@ -29,7 +30,9 @@
 | - m_lbImg: QLabel*
 | - m_dspStrategy: CDspStrategy*
 | - m_curDspStrategy: DSP_STRATEGY {缩放至适合屏幕/实际大小}
+| - m_cfgMgr : const CCfgMgr * = nullptr
 |-------------------------------------------------
+| + init(cfg : const CCFG *) : int
 | + setLbImg(lb: QLabel*) : void
 | + display(img: QPixmap*) : int
 | ~ event(ev: QEvent*) : bool {处理ScrollArea默认未处理的事件}
@@ -105,4 +108,19 @@
 |-------------------------------------------------
 | + m_focus: QPointf {屏幕中央在图片中的坐标}
 | + m_zoomPercent: int {放大倍率}
+ -------------------------------------------------
+
+ -------------------------------------------------
+|                   CCfgMgr
+|       负责配置文件的的读取/保存/修改,
+|    提供给各视窗/组件做初始化, 以及流程使用
+|-------------------------------------------------
+| - CFG_FILE_NAME : const char[] = "config.xml"
+| - m_cfg : TCfg {cfg{imgview{dspStgy:int; dspOrder:int; keyBinding:vector<{keyhash, usage}> }}}
+|-------------------------------------------------
+| + load(void) : int
+| + save(void) : int
+| + set(TCfg &&cfg) : void;
+| + getUsage(keyhash : keyhash_t) : Usage
+| + getCfg(void) : const TCfg*
  -------------------------------------------------
