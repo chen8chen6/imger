@@ -7,7 +7,7 @@
 * 缓冲区结构如下图所示:
 * 前<-----     ----->后
 * |prev_most|----|prev_avg|----|prev_least|----|cur|----|next_least|----|next_avg|----|next_most|
-* 
+*
 * prev_most: 向前缓存至多prev_most个元素, 高于该水平则删减到prev_avg个元素.
 * prev_avg: 向前缓存的元素数量高于prev_most或低于prev_least时, 调整至prev_avg水平.
 * prev_least: 向前缓存至少prev_least个元素, 低于该水平则补充到prev_avg个元素.
@@ -24,11 +24,11 @@ public:
 
     //缓冲池大小
     //小于该数目的话, 会使用cacheAll策略, 因此这里不会出现向前向后缓冲到同一个文件的情况
-    static constexpr int cacheSize(void) {return NEXT_CACHE_MOST + PREV_CACHE_MOST + 1;}
+    static constexpr int cacheSize(void) { return NEXT_CACHE_MOST + PREV_CACHE_MOST + 1; }
 
-    QString name(void) const override {return "imgMgr: Cache by num";}
-    int init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr) override;
-    pImgFile_t cur(void) const override { return *m_cur;}
+    QString name(void) const override { return "imgMgr: Cache by num"; }
+    int init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr) override;
+    pImgFile_t cur(void) const override { return *m_cur; }
     pImgFile_t prev(void) override;
     pImgFile_t next(void) override;
 

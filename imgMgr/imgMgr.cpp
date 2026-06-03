@@ -17,7 +17,7 @@ CImgMgr::~CImgMgr()
 int CImgMgr::initImgLoaderThr()
 {
     //读图线程
-    CImgLoader * imgLoader= new CImgLoader;
+    CImgLoader* imgLoader = new CImgLoader;
     imgLoader->moveToThread(&m_imgLoaderThr);
     connect(&m_imgLoaderThr, &QThread::finished, imgLoader, &QObject::deleteLater);
     connect(this, &CImgMgr::sigLoadImg, imgLoader, &CImgLoader::onSigLoadImg);
@@ -32,9 +32,9 @@ int CImgMgr::uninitImgLoaderThr()
     return 0;
 }
 
-std::shared_ptr<CImgMgr> CImgMgrFac::create(const QString &filePath, QDir::SortFlags sorting)
+std::shared_ptr<CImgMgr> CImgMgrFac::create(const QString& filePath, QDir::SortFlags sorting)
 {
-    static const QList<QString> imgSuffix = {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp"};
+    static const QList<QString> imgSuffix = { "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp" };
     std::shared_ptr<CImgMgr> ret = nullptr;
     bool isSucc = false;
 
@@ -55,15 +55,15 @@ std::shared_ptr<CImgMgr> CImgMgrFac::create(const QString &filePath, QDir::SortF
 
         //挑选合适的imgMgr
         ret = (fileMgr->size() < CCacheByNum::cacheSize())
-                ? std::shared_ptr<CImgMgr>(new CCacheAll)   //缓存所有图片
-                : std::shared_ptr<CImgMgr>(new CCacheByNum);//按数量缓存图片
+            ? std::shared_ptr<CImgMgr>(new CCacheAll)   //缓存所有图片
+            : std::shared_ptr<CImgMgr>(new CCacheByNum);//按数量缓存图片
 
         //初始化图片管理
         if (0 != ret->init(filePath, fileMgr))
             break;  //imgMgr初始化失败
 
         isSucc = true;
-    } while(0);
+    } while (0);
 
     return isSucc ? ret : nullptr;
 }

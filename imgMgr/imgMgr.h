@@ -15,7 +15,7 @@ public:
     virtual ~CImgMgr();
 
     virtual QString name(void) const = 0;
-    virtual int init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr) = 0;
+    virtual int init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr) = 0;
     virtual pImgFile_t cur(void) const = 0;
     virtual pImgFile_t prev(void) = 0;
     virtual pImgFile_t next(void) = 0;
@@ -35,7 +35,7 @@ protected:
 class CImgMgrFac
 {
 public:
-    static std::shared_ptr<CImgMgr> create(const QString &filePath, QDir::SortFlags sorting);
+    static std::shared_ptr<CImgMgr> create(const QString& filePath, QDir::SortFlags sorting);
 
 private:
     CImgMgrFac() = delete;

@@ -20,7 +20,7 @@ public:
     } TXmlNode;
 
 public:
-    static void appendChild(QDomDocument& doc, QDomElement& parent, const TXmlNode &xmlNode);
+    static void appendChild(QDomDocument& doc, QDomElement& parent, const TXmlNode& xmlNode);
     static int parseChild(TXmlNode& nodeParsed/*Output*/, QDomElement& parent, const QString& tagName);
     //static int parseInt(QDomElement& parent, const QString& tagName
         /*, IN_OUT tag_xmlNode &xmlNode*/
@@ -33,4 +33,4 @@ private:
 };
 
 
-#endif	//!XML_HELPER_H
+#endif  //!XML_HELPER_H

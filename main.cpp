@@ -5,7 +5,7 @@
 
 char** argv2Thin(int argc, wchar_t* argv[])
 {
-    char **thinArgv = new char* [argc + 1];    //argv[argc] = NULL
+    char** thinArgv = new char* [argc + 1];    //argv[argc] = NULL
     for (int i = 0; i < argc; ++i)
     {
         static constexpr int BUF_SIZE = 256;
@@ -29,13 +29,13 @@ void delThinArgv(char* argv[])
     return;
 }
 
-int wmain(int argc, wchar_t *argv[])
+int wmain(int argc, wchar_t* argv[])
 {
     //使用main(int, char*[])作为主函数时, argv里是gbk编码, 部分无法以gbk编码显示的字符会丢失,
     //因此此处使用宽字符版本的main函数,此时 wchar_t *argv[]里是unicode编码的宽字符
     //这里转成gbk编码格式的char *[]类型用于构造QApplication (注意: gbk编码里无法表示的字符会被转化成'?')
     //此处传递char* thinArgv[]给QApplication, 目的仅为保证从wmain传入的参数不至于完全丢失
-    std::shared_ptr<char*> thinArgv{ argv2Thin(argc, argv), delThinArgv};
+    std::shared_ptr<char*> thinArgv{ argv2Thin(argc, argv), delThinArgv };
     QApplication a(argc, thinArgv.get());
 
     //获取传入路径

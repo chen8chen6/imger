@@ -9,7 +9,7 @@
 #include "fileMgr.h"
 #include "cfgMgr.h"
 
-CImgView::CImgView(QWidget *parent) :
+CImgView::CImgView(QWidget* parent) :
     QDialog(parent),
     ui(new Ui::CImgView)
 {
@@ -28,7 +28,7 @@ CImgView::~CImgView()
     delete ui;
 }
 
-int CImgView::init(const QString &filePath, const CCfgMgr* cfgMgr)
+int CImgView::init(const QString& filePath, const CCfgMgr* cfgMgr)
 {
     bool isSucc = false;
     do {
@@ -58,7 +58,7 @@ int CImgView::init(const QString &filePath, const CCfgMgr* cfgMgr)
         display(m_imgMgr->cur().get());
 
         isSucc = true;
-    } while(0);
+    } while (0);
 
     if (!isSucc)
     {
@@ -66,7 +66,7 @@ int CImgView::init(const QString &filePath, const CCfgMgr* cfgMgr)
         m_imgMgr.reset();
     }
 
-    return isSucc ? 0: -1;
+    return isSucc ? 0 : -1;
 }
 
 int CImgView::displayPrev()
@@ -79,14 +79,14 @@ int CImgView::displayNext()
     return display(m_imgMgr->next().get());
 }
 
-int CImgView::display(QPixmap *img)
+int CImgView::display(QPixmap* img)
 {
     QPixmap scaled = *img;
     ui->scrollArea->display(&scaled);
     return 0;
 }
 
-int CImgView::display(tag_imgFile *pImgFile)
+int CImgView::display(tag_imgFile* pImgFile)
 {
     qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
     if (pImgFile->m_isReady)
@@ -106,13 +106,13 @@ int CImgView::display(tag_imgFile *pImgFile)
     return 0;
 }
 
-void CImgView::keyPressEvent(QKeyEvent *ev)
+void CImgView::keyPressEvent(QKeyEvent* ev)
 {
     if (nullptr == ev)
         return;
 
     qDebug() << "imgView:" << ev;
-    
+
     keyHash_t keyHash = CCfgHelper::getKeyHash(ev);
     const auto usageDict = m_cfgMgr->getCfg()->imgView.keyUsageDict;
     if (0 == usageDict.count(keyHash))
@@ -138,7 +138,7 @@ void CImgView::keyPressEvent(QKeyEvent *ev)
     return;
 }
 
-void CImgView:: updateIfLoaded()
+void CImgView::updateIfLoaded()
 {
     auto pImgFile = m_imgMgr->cur();
     if (m_imgMgr->cur()->m_isReady)

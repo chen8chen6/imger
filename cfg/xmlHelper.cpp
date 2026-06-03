@@ -29,7 +29,7 @@ void CXmlHelper::appendChild(QDomDocument& doc, QDomElement& parent, const TXmlN
     return;
 }
 
-int CXmlHelper::parseChild(TXmlNode& nodeParsed, QDomElement& parent, const QString &tagName)
+int CXmlHelper::parseChild(TXmlNode& nodeParsed, QDomElement& parent, const QString& tagName)
 {
     auto tgt = parent.firstChildElement(tagName);
     if (tgt.isNull())

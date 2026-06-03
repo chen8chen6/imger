@@ -5,7 +5,7 @@
 #include <memory>   //std::shared_ptr
 
 namespace Ui {
-class CImgView;
+    class CImgView;
 }
 
 //class QPixmap;
@@ -18,9 +18,9 @@ class CImgView : public QDialog
     Q_OBJECT
 
 public:
-    explicit CImgView(QWidget *parent = nullptr);
+    explicit CImgView(QWidget* parent = nullptr);
     ~CImgView() override;
-    int init(const QString &filePath, const CCfgMgr *cfgMgr);
+    int init(const QString& filePath, const CCfgMgr* cfgMgr);
 
     //显示图片
     int displayPrev(void);
@@ -31,18 +31,18 @@ private slots:
 
 private:
     //显示
-    int display(QPixmap *img);
-    int display(tag_imgFile * pImgFile);
+    int display(QPixmap* img);
+    int display(tag_imgFile* pImgFile);
 
     //键盘事件响应
-    void keyPressEvent(QKeyEvent *ev) override;
+    void keyPressEvent(QKeyEvent* ev) override;
 
 private:
     static constexpr int INTERVAL_CHECK_IMG_LOADED_MS = 50; //检查图像是否载入完成的时间间隔
 
-    Ui::CImgView *ui;
+    Ui::CImgView* ui;
 
-    QTimer * m_checkLoaded = nullptr;   //每隔一段时间检查图片是否加载完成
+    QTimer* m_checkLoaded = nullptr;   //每隔一段时间检查图片是否加载完成
     std::shared_ptr<CImgMgr> m_imgMgr = nullptr;                //图片缓存池
 
     const CCfgMgr* m_cfgMgr = nullptr;

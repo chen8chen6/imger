@@ -9,8 +9,8 @@ class CCacheAll : public CImgMgr
 public:
     CCacheAll();
 
-    QString name(void) const override {return "imgMgr: Cache all";}
-    int init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr) override;
+    QString name(void) const override { return "imgMgr: Cache all"; }
+    int init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr) override;
     pImgFile_t cur(void) const override;
     pImgFile_t prev(void) override;
     pImgFile_t next(void) override;

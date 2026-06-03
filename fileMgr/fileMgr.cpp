@@ -14,7 +14,7 @@ CFileMgr::~CFileMgr()
 
 }
 
-int CFileMgr::init(const QString &filePath, const QDir &dir)
+int CFileMgr::init(const QString& filePath, const QDir& dir)
 {
     bool isSucc = false;
     do
@@ -38,24 +38,24 @@ int CFileMgr::init(const QString &filePath, const QDir &dir)
         }
 
         isSucc = true;
-    } while(0);
+    } while (0);
 
     return isSucc ? 0 : -1;
 }
 
-bool CFileMgr::exist(const QFileInfo &file) const
+bool CFileMgr::exist(const QFileInfo& file) const
 {
     return fileConstIter(file) != m_fileList.cend();
 }
 
-QFileInfo CFileMgr::fileBefore(const QFileInfo &file)
+QFileInfo CFileMgr::fileBefore(const QFileInfo& file)
 {
     auto iter = fileConstIter(file);
     moveBackward(iter);
     return *iter;
 }
 
-QFileInfoList CFileMgr::nFilesBefore(int n, const QFileInfo &file)
+QFileInfoList CFileMgr::nFilesBefore(int n, const QFileInfo& file)
 {
     auto iter = fileConstIter(file);
     if (m_fileList.cend() == iter)
@@ -71,7 +71,7 @@ QFileInfoList CFileMgr::nFilesBefore(int n, const QFileInfo &file)
     return ret;
 }
 
-QFileInfo CFileMgr::fileAfter(const QFileInfo &file)
+QFileInfo CFileMgr::fileAfter(const QFileInfo& file)
 {
     auto iter = fileConstIter(file);
     if (m_fileList.cend() == iter)
@@ -81,7 +81,7 @@ QFileInfo CFileMgr::fileAfter(const QFileInfo &file)
     return *iter;
 }
 
-QFileInfoList CFileMgr::nFilesAfter(int n, const QFileInfo &file)
+QFileInfoList CFileMgr::nFilesAfter(int n, const QFileInfo& file)
 {
     auto iter = fileConstIter(file);
     if (m_fileList.cend() == iter)
@@ -97,7 +97,7 @@ QFileInfoList CFileMgr::nFilesAfter(int n, const QFileInfo &file)
     return ret;
 }
 
-bool CFileMgr::sortByPrefixAndIdx(const QFileInfo &l, const QFileInfo &r)
+bool CFileMgr::sortByPrefixAndIdx(const QFileInfo& l, const QFileInfo& r)
 {
     //TODO: 输入的是一定程度排序后的数组, 相似名称的元素会聚到一起, 理论上应该可以加速
     QString lName = l.fileName(), lPrefix, lIdx, lRemain;
@@ -123,14 +123,14 @@ bool CFileMgr::sortByPrefixAndIdx(const QFileInfo &l, const QFileInfo &r)
         return lPrefix < rPrefix;   //对比前缀
     else
         return (lIdx.toInt() == rIdx.toInt())    //对比序号
-            ? lIdx < rIdx   //数值一致则按字符串对比
-            : lIdx.toInt() < rIdx.toInt();
+        ? lIdx < rIdx   //数值一致则按字符串对比
+        : lIdx.toInt() < rIdx.toInt();
 }
 
-void CFileMgr::split(const QString &origin, QString &prefix, QString &idx, QString &remain)
+void CFileMgr::split(const QString& origin, QString& prefix, QString& idx, QString& remain)
 {
     //(n个non-digit)(n个digit)(其余部分)
-    static const QRegularExpression mask{R"(^(?<prefix>\D*)(?<index>\d*)(?<remain>.*)$)"};
+    static const QRegularExpression mask{ R"(^(?<prefix>\D*)(?<index>\d*)(?<remain>.*)$)" };
 
     auto match = mask.match(origin);
     if (match.hasMatch())
@@ -155,18 +155,18 @@ void CFileMgr::split(const QString &origin, QString &prefix, QString &idx, QStri
     return std::find(m_fileList.begin(), m_fileList.end(), file);
 }*/
 
-QFileInfoList::const_iterator CFileMgr::fileConstIter(const QFileInfo &file) const
+QFileInfoList::const_iterator CFileMgr::fileConstIter(const QFileInfo& file) const
 {
     return std::find(m_fileList.cbegin(), m_fileList.cend(), file);
 }
 
-void CFileMgr::moveForward(QFileInfoList::const_iterator &iter) const
+void CFileMgr::moveForward(QFileInfoList::const_iterator& iter) const
 {
     if (m_fileList.cend() == ++iter)
         iter = m_fileList.begin();
 }
 
-void CFileMgr::moveBackward(QFileInfoList::const_iterator &iter) const
+void CFileMgr::moveBackward(QFileInfoList::const_iterator& iter) const
 {
     if (m_fileList.begin() == iter)
         iter = m_fileList.cend();

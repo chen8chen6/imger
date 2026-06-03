@@ -62,4 +62,4 @@ private:
     static bool isUsageType(Usage usage, Usage usageType);
 };
 
-#endif	//!CFG_DEF_H
+#endif  //!CFG_DEF_H

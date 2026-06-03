@@ -8,13 +8,13 @@ CCacheAll::CCacheAll()
 
 }
 
-int CCacheAll::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
+int CCacheAll::init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr)
 {
     qDebug() << name();
 
     //缓存
     QFileInfoList allFiles = fileMgr->allFiles();
-    for (const auto &file : allFiles)
+    for (const auto& file : allFiles)
     {
         //这个策略里, 缓存完成后只读不写
         pImgFile_t pImgFile(new TImgFile(file, pImg_t(new QPixmap(file.absoluteFilePath()))));
@@ -25,7 +25,7 @@ int CCacheAll::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
     //定位迭代器
     QFileInfo curImg(imgPath);
     m_cur = std::find_if(m_cache.begin(), m_cache.end(),
-                         [&](const pImgFile_t &pImg){ return pImg->m_info == curImg; });
+        [&](const pImgFile_t& pImg) { return pImg->m_info == curImg; });
     if (m_cache.end() == m_cur)
         return -1;  //文件未找到
 

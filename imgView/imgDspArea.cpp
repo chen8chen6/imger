@@ -14,7 +14,7 @@ using std::chrono::steady_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-CImgDspArea::CImgDspArea(QWidget *parent)
+CImgDspArea::CImgDspArea(QWidget* parent)
     : QScrollArea(parent)
 {
     //m_lbImg = new QLabel(this);
@@ -39,7 +39,7 @@ void CImgDspArea::setDspStrategy(const CImgDspArea::DSP_STRATEGY strategy)
     return;
 }
 
-int CImgDspArea::display(QPixmap *img)
+int CImgDspArea::display(QPixmap* img)
 {
     m_curImg = *img;
     QPixmap scaled = *img;
@@ -56,12 +56,12 @@ int CImgDspArea::display(QPixmap *img)
     return 0;
 }
 
-void CImgDspArea::keyPressEvent(QKeyEvent *ev)
+void CImgDspArea::keyPressEvent(QKeyEvent* ev)
 {
     qDebug() << "dspArea:" << ev << ev->isAccepted();
 
     keyHash_t keyHash = CCfgHelper::getKeyHash(ev);
-    const auto &dict = m_cfgMgr->getCfg()->imgView.keyUsageDict;
+    const auto& dict = m_cfgMgr->getCfg()->imgView.keyUsageDict;
     if (0 == dict.count(keyHash)
         || !CCfgHelper::isImgUsage(dict.at(keyHash)))
     {
@@ -81,19 +81,19 @@ void CImgDspArea::keyPressEvent(QKeyEvent *ev)
         zoom(100);  //原始大小
         break;
     case Usage::SightUp:
-        moveSight(0, 0 - dspHeight()/4);
+        moveSight(0, 0 - dspHeight() / 4);
         updateImgFocus();
         break;
     case Usage::SightDown:
-        moveSight(0, dspHeight()/4);
+        moveSight(0, dspHeight() / 4);
         updateImgFocus();
         break;
     case Usage::SightLeft:
-        moveSight(0-dspWidth()/4, 0);
+        moveSight(0 - dspWidth() / 4, 0);
         updateImgFocus();
         break;
     case Usage::SightRight:
-        moveSight(dspWidth()/4, 0);
+        moveSight(dspWidth() / 4, 0);
         updateImgFocus();
         break;
     case Usage::SightUp_1px:
@@ -121,10 +121,10 @@ void CImgDspArea::keyPressEvent(QKeyEvent *ev)
     return;
 }
 
-void CImgDspArea::wheelEvent(QWheelEvent *ev)
+void CImgDspArea::wheelEvent(QWheelEvent* ev)
 {
     QPoint pix = ev->pixelDelta();
-    QPoint angle= ev->angleDelta();
+    QPoint angle = ev->angleDelta();
 
     qDebug() << "dspArea" << ev << pix << angle;
 
@@ -133,19 +133,19 @@ void CImgDspArea::wheelEvent(QWheelEvent *ev)
     return;
 }
 
-void CImgDspArea::resizeEvent(QResizeEvent *ev)
+void CImgDspArea::resizeEvent(QResizeEvent* ev)
 {
     QScrollArea::resizeEvent(ev);
 
     //TODO: 理论上应该有更好的判断当前显示策略的方式
     qDebug() << __FUNCTION__ << ev->oldSize() << "->" << ev->size();
-     if (DSP_STRATEGY::FitWin == m_curDspStrategy)
-     {
+    if (DSP_STRATEGY::FitWin == m_curDspStrategy)
+    {
         m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));
-     }
+    }
 
-     display(&m_curImg);    //刷新当前图片显示
-     updateImgFocus();      //更新焦点, 定位
+    display(&m_curImg);    //刷新当前图片显示
+    updateImgFocus();      //更新焦点, 定位
 
     return;
 }
@@ -177,7 +177,7 @@ QPointF CImgDspArea::diff_topLeft2Center() const
     const auto imgSize = m_lbImg->pixmap()->size();
     const qreal w = std::min(dspWidth(), imgSize.width());
     const qreal h = std::min(dspHeight(), imgSize.height());
-    return QPointF((w-1)/2.0, (h-1)/2.0);
+    return QPointF((w - 1) / 2.0, (h - 1) / 2.0);
 }
 int CImgDspArea::moveSight(int dx, int dy)
 {
@@ -234,10 +234,10 @@ QPixmap CImgDspArea::scaleImg(int percent) const
     //缩放当前图片
     auto start = steady_clock::now();
     int curZoom = m_dspSt.m_zoom_percent;   //TODO: 换成qreal提升精度?
-    QPixmap scaled = m_curImg.scaled(m_curImg.size()*percent/100,
-                                     Qt::KeepAspectRatio,
-                                     Qt::SmoothTransformation);
-    auto cost = duration_cast<milliseconds>(steady_clock::now()-start);
+    QPixmap scaled = m_curImg.scaled(m_curImg.size() * percent / 100,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation);
+    auto cost = duration_cast<milliseconds>(steady_clock::now() - start);
 
     qDebug() << "zoom(" << cost.count() << "ms)" << curZoom << "->" << percent;
     qDebug() << " size:" << m_lbImg->pixmap()->size() << "->" << scaled.size();

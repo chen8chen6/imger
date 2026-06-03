@@ -11,7 +11,7 @@ keyHash_t CCfgHelper::getKeyHash(const QKeyEvent* ev)
 {
     if (nullptr == ev)
         return 0;
-    
+
     int mod = NO_MODIFILER;
     auto modFlags = ev->modifiers();
     if (modFlags.testFlag(Qt::ControlModifier))

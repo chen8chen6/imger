@@ -14,7 +14,7 @@ CCacheByNum::~CCacheByNum()
     uninitImgLoaderThr();
 }
 
-int CCacheByNum::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
+int CCacheByNum::init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr)
 {
     bool isSucc = false;
     do
@@ -46,14 +46,14 @@ int CCacheByNum::init(const QString &imgPath, std::shared_ptr<CFileMgr> fileMgr)
             cachePrev(file);
         m_prevCached = PREV_CACHE_AVG;
 
-        qDebug() << "=== cache ===" ;
-        for (const auto &imgFile : m_cache)
+        qDebug() << "=== cache ===";
+        for (const auto& imgFile : m_cache)
             qDebug() << imgFile->m_info.fileName();
         qDebug() << "cached prev:" << m_prevCached << ", next:" << m_nextCached;
         qDebug() << "=============";
 
         isSucc = true;
-    } while(0);
+    } while (0);
 
     if (!isSucc)
     {
@@ -82,7 +82,7 @@ pImgFile_t CCacheByNum::prev()
     if (--m_prevCached < PREV_CACHE_LEAST)
     {
         auto fileList = m_fileMgr->nFilesBefore(PREV_CACHE_AVG - m_prevCached, m_cache.front()->m_info);
-        for (auto &file2Cache : fileList)
+        for (auto& file2Cache : fileList)
         {
             qDebug() << "(cache)<-: " << file2Cache.fileName();
             cachePrev(file2Cache);

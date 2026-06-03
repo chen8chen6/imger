@@ -1,23 +1,23 @@
 #ifndef CIMGDSPAREA_H
 #define CIMGDSPAREA_H
 
-#if 0
-|<----------img.width----------->|
-----------------------------------
-|dspArea外的图像对用户不可见        |
-|    |<------dsp.width------>|   |
-|    -------------------------   |
-|    | dspArea(填满屏幕)      |   |
-|    | 区域内图像对用户可见     |   |
-|    |                       |   |
-|    |       (中心焦点)       |   |
-|    |                       |   |
-|    |                       |   |
-|    |                       |   |
-|    -------------------------   |
-|                                |
-----------------------------------
-#endif
+/*
+    |<----------img.width----------->|
+    ----------------------------------
+    | dspArea外的图像对用户不可见      |
+    |    |<------dsp.width------>|   |
+    |    -------------------------   |
+    |    | dspArea(填满屏幕)      |   |
+    |    | 区域内图像对用户可见    |   |
+    |    |                       |   |
+    |    |       (中心焦点)       |   |
+    |    |                       |   |
+    |    |                       |   |
+    |    |                       |   |
+    |    -------------------------   |
+    |                                |
+    ----------------------------------
+*/
 
 #include <QScrollArea>
 #include <memory>   //std::shared_ptr
@@ -31,20 +31,20 @@ class CImgDspArea : public QScrollArea
     Q_OBJECT
 
 public:
-    enum class DSP_STRATEGY {RealSize = 0, FitWin,};    //图片显示策略
+    enum class DSP_STRATEGY { RealSize = 0, FitWin, };    //图片显示策略
 
 public:
-    CImgDspArea(QWidget *parent = nullptr);
+    CImgDspArea(QWidget* parent = nullptr);
     ~CImgDspArea() override {}
     int init(const CCfgMgr* cfgMgr) { m_cfgMgr = cfgMgr; return 0; }
-    void setLbImg(QLabel *lb) { m_lbImg = lb; }
+    void setLbImg(QLabel* lb) { m_lbImg = lb; }
     void setDspStrategy(const DSP_STRATEGY strategy);
-    int display(QPixmap *img);
+    int display(QPixmap* img);
 
 protected:
-    void keyPressEvent(QKeyEvent *ev) override;
-    void wheelEvent(QWheelEvent *ev) override;
-    void resizeEvent(QResizeEvent *ev) override;
+    void keyPressEvent(QKeyEvent* ev) override;
+    void wheelEvent(QWheelEvent* ev) override;
+    void resizeEvent(QResizeEvent* ev) override;
 
 private:
     static constexpr int ZOOM_MAX = 1000;   //最大缩放倍率
@@ -64,7 +64,7 @@ private:
     int zoom(int percent);  //percent = [ZOOM_MIN, ZOOM_MAX]
     QPixmap scaleImg(int percent) const;
     qreal zoomCoord(const qreal Xm, const int percent, const int curZoom,
-                    const int imgWidth, const int dspWidth) const;
+        const int imgWidth, const int dspWidth) const;
 
     //dspArea的宽高(不包括边框和滚动条)
     int dspWidth(void) const;
@@ -72,9 +72,9 @@ private:
 
 private:
     const CCfgMgr* m_cfgMgr = nullptr;
-    QScrollBar * hScroll = nullptr;     //水平滚动条
-    QScrollBar * vScroll = nullptr;     //垂直滚动条
-    QLabel *m_lbImg = nullptr;      //用来显示图片的组件
+    QScrollBar* hScroll = nullptr;     //水平滚动条
+    QScrollBar* vScroll = nullptr;     //垂直滚动条
+    QLabel* m_lbImg = nullptr;      //用来显示图片的组件
     QPixmap m_curImg;       //原始图片
 
     //图片显示策略
