@@ -39,6 +39,7 @@ set (DIR_FILE_MGR ${PROJECT_SOURCE_DIR}/fileMgr)
 set (DIR_IMG_MGR ${PROJECT_SOURCE_DIR}/imgMgr)
 set (DIR_IMG_VIEW ${PROJECT_SOURCE_DIR}/imgView)
 set (DIR_CFG ${PROJECT_SOURCE_DIR}/cfg)
+set (DIR_CFG_DLG ${DIR_CFG}/cfgDlg)
 
 ##### 源文件 #####
 set (SRC_IMG_TYPE ${PROJECT_SOURCE_DIR}/imgType.h ${PROJECT_SOURCE_DIR}/imgType.cpp)
@@ -53,15 +54,20 @@ set (SRC_IMG_VIEW ${DIR_IMG_VIEW}/imgView.h ${DIR_IMG_VIEW}/imgView.cpp ${DIR_IM
 set (SRC_CFG ${DIR_CFG}/cfgDef.h ${DIR_CFG}/cfgDef.cpp
 		${DIR_CFG}/cfgMgr.h ${DIR_CFG}/cfgMgr.cpp
 		${DIR_CFG}/xmlHelper.h ${DIR_CFG}/xmlHelper.cpp)
+set (SRC_CFG_DLG ${DIR_CFG_DLG}/cfgItem.h ${DIR_CFG_DLG}/cfgItem.cpp
+		${DIR_CFG_DLG}/cfgDlg.h ${DIR_CFG_DLG}/cfgDlg.cpp ${DIR_CFG_DLG}/cfgDlg.ui
+		${DIR_CFG_DLG}/cfgDelegate.h ${DIR_CFG_DLG}/cfgDelegate.cpp
+		${DIR_CFG_DLG}/cfgModel.h ${DIR_CFG_DLG}/cfgModel.cpp)
 
 ##### 项目文件中的目录结构 #####
 source_group (fileMgr FILES ${SRC_FILE_MGR})
 source_group (imgMgr FILES ${SRC_IMG_MGR})
 source_group (imgView FILES ${SRC_IMG_VIEW})
 source_group (cfg FILES ${SRC_CFG})
+source_group (cfg/cfgDlg FILES ${SRC_CFG_DLG})
 
 ##### 头文件包含目录 #####
-include_directories (${PROJECT_SOURCE_DIR} ${DIR_FILE_MGR} ${DIR_IMG_MGR} ${DIR_IMG_VIEW} ${DIR_CFG})
+include_directories (${PROJECT_SOURCE_DIR} ${DIR_FILE_MGR} ${DIR_IMG_MGR} ${DIR_IMG_VIEW} ${DIR_CFG} ${DIR_CFG_DLG})
 
 ##### 编译 #####
 set (CMAKE_CXX_STANDARD 17)
@@ -69,7 +75,8 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options (/utf-8)	#解决vs报"常量中有换行符"问题
 
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-ADD_EXECUTABLE(${PROJECT_NAME} main.cpp ${SRC_IMG_TYPE} ${SRC_FILE_MGR} ${SRC_IMG_MGR} ${SRC_IMG_VIEW} ${SRC_CFG} ${PROJECT_SOURCE_DIR}/res/res.qrc)
+ADD_EXECUTABLE(${PROJECT_NAME} main.cpp ${SRC_IMG_TYPE} ${SRC_FILE_MGR} ${SRC_IMG_MGR} ${SRC_IMG_VIEW}
+		${SRC_CFG} ${SRC_CFG_DLG} ${PROJECT_SOURCE_DIR}/res/res.qrc)
 
 #连接动态库
 foreach(COMP IN LISTS QT_COMPNENTS_REQUIRED)

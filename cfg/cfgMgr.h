@@ -6,43 +6,49 @@
 
 class QDomDocument;
 class QDomElement;
-class CCfgMgr
+namespace CFG
 {
-public:
-    typedef struct tag_imgViewCfg
+    class CCfgMgr
     {
-        int dspStgy = 0;    //0: RealSize; 1: FitWin
-        int dspOrder = 0;   //0: SortByName, 1: SortByTime
-        std::map<keyHash_t, Usage> keyUsageDict;    //使用keyHash索引找对应的usage
-    } TImgViewCfg;
-    typedef struct tag_cfg { TImgViewCfg imgView; } TCfg;
+    public:
+        typedef struct tag_imgViewCfg
+        {
+            int dspStgy = 0;    //0: RealSize; 1: FitWin
+            int dspOrder = 0;   //0: SortByName, 1: SortByTime
+            std::map<keyHash_t, Usage> keyUsageDict;    //使用keyHash索引找对应的usage
+        } TImgViewCfg;
+        typedef struct tag_cfg { TImgViewCfg imgView; } TCfg;
 
-public:
-    static CCfgMgr* getSingleton(void);
-    int load(void);
-    int save(void) const;
-    const TCfg* getCfg(void) const { return &m_cfg; }
-    //int set(const CCFG *cfg); //TODO: TCFG &&
+    public:
+        static CCfgMgr* getSingleton(void);
+        int load(void);
+        int save(void) const;
+        void reset(void);
+        void update(const TCfg& other) { m_cfg = other; };
+        void update(TCfg&& other) { std::swap(m_cfg, other); };
+        const TCfg* getCfg(void) const { return &m_cfg; }
+        //int set(const CCFG *cfg); //TODO: TCFG &&
 
-private:
-    static constexpr char CFG_FILE_NAME[] = "config.xml";
+    private:
+        static constexpr char CFG_FILE_NAME[] = "config.xml";
 
-private:
-    CCfgMgr() {};
-    CCfgMgr(const CCfgMgr& cfg) = delete;
-    CCfgMgr(const CCfgMgr&& cfg) = delete;
-    virtual ~CCfgMgr() {};
+    private:
+        CCfgMgr() {};
+        CCfgMgr(const CCfgMgr& cfg) = delete;
+        CCfgMgr(const CCfgMgr&& cfg) = delete;
+        virtual ~CCfgMgr() {};
 
-    void buildCfg_imgView(QDomDocument& doc, QDomElement& root) const;
-    int parseCfg_imgView(QDomDocument& doc, QDomElement& root);
-    int saveFile(QDomDocument& doc) const;
+        void buildCfg_imgView(QDomDocument& doc, QDomElement& root) const;
+        int parseCfg_imgView(QDomDocument& doc, QDomElement& root);
+        int saveFile(QDomDocument& doc) const;
 
-    static void appendKeyUsage(QDomDocument& doc, QDomElement& parent,
-        keyHash_t keyHash, Usage usage);
+        static void appendKeyUsage(QDomDocument& doc, QDomElement& parent,
+            keyHash_t keyHash, Usage usage);
 
-private:
-    TCfg m_cfg;
-};
+    private:
+        TCfg m_cfg;
+    };
+}   //! namespace CFG
 
 
 #endif  //!CFG_MGR_H

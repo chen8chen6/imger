@@ -9,6 +9,11 @@
 #include "fileMgr.h"
 #include "cfgMgr.h"
 
+using CFG::CCfgMgr;
+using CFG::CCfgHelper;
+using CFG::keyHash_t;
+using CFG::Usage;
+
 CImgView::CImgView(QWidget* parent) :
     QDialog(parent),
     ui(new Ui::CImgView)
@@ -16,7 +21,6 @@ CImgView::CImgView(QWidget* parent) :
     ui->setupUi(this);
 
     ui->scrollArea->setLbImg(ui->lbImg);
-    ui->scrollArea->setDspStrategy(CImgDspArea::DSP_STRATEGY::RealSize);
 
     //图片载入完成时, 进行更新
     m_checkLoaded = new QTimer(this);
@@ -40,7 +44,7 @@ int CImgView::init(const QString& filePath, const CCfgMgr* cfgMgr)
 
         //图片管理
         //如果返回空指针,代表初始化失败
-        auto dspOrder = (0 == cfg->imgView.dspOrder)    //TODO: 使用枚举, 在imgMgr类的内部实际处理最终顺序
+        auto dspOrder = (static_cast<int>(CFG::DspOrder::ByName) == cfg->imgView.dspOrder)    //TODO: 在imgMgr类的内部实际处理最终顺序
             ? QDir::SortFlags(QDir::Name | QDir::IgnoreCase)
             : QDir::SortFlags(QDir::Time);
         m_imgMgr = CImgMgrFac::create(filePath, dspOrder);
@@ -48,11 +52,7 @@ int CImgView::init(const QString& filePath, const CCfgMgr* cfgMgr)
             break;
 
         //设置显示策略
-        auto dspStgy = (0 == cfg->imgView.dspStgy)
-            ? CImgDspArea::DSP_STRATEGY::RealSize   //TODO: 这个枚举再逻辑上与CImgDspArea并非强关联, 可以提升到更上层的位置
-            : CImgDspArea::DSP_STRATEGY::FitWin;
         ui->scrollArea->init(cfgMgr);
-        ui->scrollArea->setDspStrategy(dspStgy);
 
         //显示图片
         display(m_imgMgr->cur().get());

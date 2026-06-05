@@ -25,20 +25,23 @@
 class QLabel;
 class QScrollBar;
 class CDspStrategy;
-class CCfgMgr;
+namespace CFG
+{
+    class CCfgMgr;
+    enum class DspStgy;
+}
+
+static constexpr int operator ""_percent(unsigned long long percent) { return percent; };
+
 class CImgDspArea : public QScrollArea
 {
     Q_OBJECT
 
 public:
-    enum class DSP_STRATEGY { RealSize = 0, FitWin, };    //图片显示策略
-
-public:
     CImgDspArea(QWidget* parent = nullptr);
     ~CImgDspArea() override {}
-    int init(const CCfgMgr* cfgMgr) { m_cfgMgr = cfgMgr; return 0; }
+    int init(const CFG::CCfgMgr* cfgMgr);
     void setLbImg(QLabel* lb) { m_lbImg = lb; }
-    void setDspStrategy(const DSP_STRATEGY strategy);
     int display(QPixmap* img);
 
 protected:
@@ -47,8 +50,8 @@ protected:
     void resizeEvent(QResizeEvent* ev) override;
 
 private:
-    static constexpr int ZOOM_MAX = 1000;   //最大缩放倍率
-    static constexpr int ZOOM_MIN = 5;      //最小缩放倍率
+    static constexpr int ZOOM_MAX = 1000_percent;   //最大缩放倍率
+    static constexpr int ZOOM_MIN = 5_percent;      //最小缩放倍率
 
 private:
     //更新图片焦点
@@ -71,7 +74,7 @@ private:
     int dspHeight(void) const;
 
 private:
-    const CCfgMgr* m_cfgMgr = nullptr;
+    const CFG::CCfgMgr* m_cfgMgr = nullptr;
     QScrollBar* hScroll = nullptr;     //水平滚动条
     QScrollBar* vScroll = nullptr;     //垂直滚动条
     QLabel* m_lbImg = nullptr;      //用来显示图片的组件
@@ -79,7 +82,6 @@ private:
 
     //图片显示策略
     std::shared_ptr<CDspStrategy> m_dspStrategy = nullptr;
-    DSP_STRATEGY m_curDspStrategy = DSP_STRATEGY::RealSize;
 
     struct {
         QPointF m_focus = QPointF(0.0, 0.0); //图片焦点, 即图片显示在dspArea正中的像素点坐标

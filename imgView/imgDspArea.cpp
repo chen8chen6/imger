@@ -13,6 +13,10 @@
 using std::chrono::steady_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
+using CFG::CCfgMgr;
+using CFG::CCfgHelper;
+using CFG::keyHash_t;
+using CFG::Usage;
 
 CImgDspArea::CImgDspArea(QWidget* parent)
     : QScrollArea(parent)
@@ -22,21 +26,16 @@ CImgDspArea::CImgDspArea(QWidget* parent)
     vScroll = verticalScrollBar();
 }
 
-void CImgDspArea::setDspStrategy(const CImgDspArea::DSP_STRATEGY strategy)
+int CImgDspArea::init(const CCfgMgr* cfgMgr)
 {
-    m_curDspStrategy = strategy;
-    switch (strategy)
-    {
-    case DSP_STRATEGY::RealSize:
+    m_cfgMgr = cfgMgr;
+
+    if (static_cast<int>(CFG::DspStgy::RealSize) == m_cfgMgr->getCfg()->imgView.dspStgy)
         m_dspStrategy.reset(new CRealSize);
-        break;
-    case DSP_STRATEGY::FitWin:
+    else
         m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));
-        break;
-    default:
-        break;
-    }
-    return;
+
+    return 0;
 }
 
 int CImgDspArea::display(QPixmap* img)
@@ -137,9 +136,8 @@ void CImgDspArea::resizeEvent(QResizeEvent* ev)
 {
     QScrollArea::resizeEvent(ev);
 
-    //TODO: 理论上应该有更好的判断当前显示策略的方式
     qDebug() << __FUNCTION__ << ev->oldSize() << "->" << ev->size();
-    if (DSP_STRATEGY::FitWin == m_curDspStrategy)
+    if (static_cast<int>(CFG::DspStgy::FitWin) == m_cfgMgr->getCfg()->imgView.dspStgy)
     {
         m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));
     }
