@@ -22,7 +22,7 @@ tag_imgFile& tag_imgFile::operator=(const tag_imgFile& other)
     m_info = other.m_info;
     m_pImg = other.m_pImg;
     bool isReady = other.m_isReady;
-    m_isReady = isReady;    //TODO: atomic变量不能直接赋给atomic变量?
+    m_isReady = isReady;
     return *this;
 }
 

@@ -2,6 +2,8 @@
 #include <QComboBox>
 #include <QDebug>
 #include "cfgItem.h"
+#include "cfgEdit.h"
+#include "cfgHelper.h"    //getKeyHash(), desc()
 
 namespace CFG {
     QWidget* CCfgDele::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -12,11 +14,12 @@ namespace CFG {
         case CFG::InvalidEditor:
             break;
         case CFG::IntEditor_comboBox:
-            res = createEditor(parent, TCfgItem::fromItem(index));
+            res = createComboBoxEditor(parent, TCfgItem::fromItem(index));
             break;
         case CFG::IntEditor_line:
             break;
         case CFG::KeyEditor:
+            res = createKeyEditor(parent, TCfgItem::fromItem(index));
             break;
         default:
             break;
@@ -35,14 +38,20 @@ namespace CFG {
         {
             QComboBox* cb = static_cast<QComboBox*>(editor);
             int idx = cb->findData(index.data(Role::CfgValRole));
-            qDebug() << "find " << index.data(Role::CfgValRole).toInt() << "at idx" << idx;
+            //qDebug() << "find " << index.data(Role::CfgValRole).toInt() << "at idx" << idx;
             cb->setCurrentIndex(std::max(0, idx));
             break;
         }
         case CFG::IntEditor_line:
             break;
         case CFG::KeyEditor:
+        {
+            CKeyEdit* k = static_cast<CKeyEdit*>(editor);
+            keyHash_t keyHash = index.data(Role::CfgValRole).toLongLong();
+            k->setKeyHash(keyHash);
+            k->setText(CCfgHelper::desc(keyHash));
             break;
+        }
         default:
             break;
         }
@@ -58,21 +67,28 @@ namespace CFG {
         case CFG::IntEditor_comboBox:
         {
             /**
-            * µ÷ÓÃsetData()»á´¥·¢setEditor()ÒıÆğÊı¾İ±ä¶¯,
-            * µ¼ÖÂcurrentText()ºÍcurrentDataÈ¡µ½·ÇÔ¤ÆÚÖµ,
-            * Òò´Ë´Ë´¦ĞèÒª±£´æÒ»·İ¸±±¾ÓÃÓÚ¸üĞÂ
+            * è°ƒç”¨setData()ä¼šè§¦å‘setEditor()å¼•èµ·æ•°æ®å˜åŠ¨,
+            * å¯¼è‡´currentText()å’ŒcurrentDataå–åˆ°éé¢„æœŸå€¼,
+            * å› æ­¤æ­¤å¤„éœ€è¦ä¿å­˜ä¸€ä»½å‰¯æœ¬ç”¨äºæ›´æ–°
             **/
             QComboBox* cb = static_cast<QComboBox*>(editor);
             QVariant newDesc = cb->currentText();
             QVariant newCfgVal = cb->currentData();
-            model->setData(index, newDesc, Role::CfgDescRole);
             model->setData(index, newCfgVal, Role::CfgValRole);
+            model->setData(index, newDesc, Role::CfgDescRole);
             break;
         }
         case CFG::IntEditor_line:
             break;
         case CFG::KeyEditor:
+        {
+            CKeyEdit* k = static_cast<CKeyEdit*>(editor);
+            keyHash_t keyHash = k->getKeyHash();
+            //TODO: æ£€æµ‹åˆ°æŒ‰é”®å†²çªåˆ™ä¸æ›´æ–°
+            model->setData(index, keyHash, Role::CfgValRole);
+            model->setData(index, CCfgHelper::desc(keyHash), Role::CfgDescRole);
             break;
+        }
         default:
             break;
         }
@@ -92,14 +108,21 @@ namespace CFG {
         return (varType.canConvert<int>()) ? varType.toInt() : CfgValType::InvalidValType;
     }
 
-    QWidget* CCfgDele::createEditor(QWidget* parent, const TCfgItem& cfgItem) const
+    QWidget* CCfgDele::createComboBoxEditor(QWidget* parent, const TCfgItem& cfgItem) const
     {
-        //Ìí¼ÓÑ¡Ïî
+        //æ·»åŠ é€‰é¡¹
         QComboBox* cb = new QComboBox(parent);
         const int cnt = std::min(cfgItem.cbDescs.count(), cfgItem.cbVals.count());
         for (int i = 0; i < cnt; ++i)
             cb->addItem(cfgItem.cbDescs.at(i), cfgItem.cbVals.at(i));
         return cb;
     }
+
+    QWidget* CCfgDele::createKeyEditor(QWidget* parent, const tag_cfgItem& cfgItem) const
+    {
+        CKeyEdit* k = new CKeyEdit(parent);
+        return k;
+    }
+
 
 }   //!namespace CFG

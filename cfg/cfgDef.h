@@ -1,54 +1,65 @@
 #ifndef CFG_DEF_H
 #define CFG_DEF_H
 
+//TODO: è½¬æˆenum
 #define NO_MODIFILER    0x0
 #define MOD_CTRL        0x1
 #define MOD_ALT         0x2
 #define MOD_SHIFT       0x4
 
-class QKeyEvent;
 namespace CFG
 {
     typedef long long keyHash_t;
 
-    //ÏÔÊ¾²ßÂÔ
-    enum class DspStgy
+    //æ˜¾ç¤ºç­–ç•¥
+    //enumæ”¾åœ¨classé‡Œæ—¢æœ‰ç‹¬ç«‹å‘½åç©ºé—´, ä½œä¸ºintä½¿ç”¨æ—¶åˆä¸ç”¨static_cast
+    class DspStgy
     {
-        RealSize = 0,
-        FitWin,
+    public:
+        enum Stgy
+        {
+            RealSize = 0,
+            FitWin,
+        };
+        //TODO: descå‡½æ•°å¯ä»¥æ”¾åœ¨è¿™é‡Œ, enumä¹Ÿå¯ä»¥ä½¿ç”¨Q_ENUM
     };
 
-    //ÏÔÊ¾Ë³Ğò
-    enum class DspOrder
+    //æ˜¾ç¤ºé¡ºåº
+    class DspOrder
     {
-        ByName = 0,
-        ByTime,
+    public:
+        enum Order
+        {
+            ByName = 0,
+            ByTime,
+        };
     };
 
-    //¼üÊó²Ù×÷¶ÔÓ¦µÄ¹¦ÄÜ/ÓÃÍ¾
+    //é”®é¼ æ“ä½œå¯¹åº”çš„åŠŸèƒ½/ç”¨é€”
+    //è¿™ä¸ªæšä¸¾ä½¿ç”¨æ—¶éœ€è¦é¿å…éšå¼è½¬æ¢, å› æ­¤ä½¿ç”¨enum class
     enum class Usage
     {
         Invalid = 0,
 
-        //´°¿Ú²Ù×÷
+        //çª—å£æ“ä½œ
         Win = 0x100,
         Help,
 
-        //ÎÄ¼ş²Ù×÷
+        //æ–‡ä»¶æ“ä½œ
         File = 0x200,
         Copy,
         Del,
         Next_Img,
         Prev_Img,
 
-        //Í¼Æ¬¹Û¿´²Ù×÷
+        //å›¾ç‰‡è§‚çœ‹æ“ä½œ
         Img = 0x300,
-        //Ëõ·Å
+        //ç¼©æ”¾
         ZoomIn,
         ZoomOut,
         ZoomReset,
-        //ÒÆ¶¯ÊÓÏß
-        SightUp,
+        //ç§»åŠ¨è§†çº¿
+        SightUp,    //TODO: rename to lookUp?
         SightDown,
         SightLeft,
         SightRight,
@@ -58,27 +69,5 @@ namespace CFG
         SightRight_1px,
     };
 
-    class CCfgHelper
-    {
-    public:
-        //½«°´¼ü¼°Æä¹¦ÄÜ¼üºÏ²¢¼ÆËãÎªÒ»¸ö64Î»³¤ÕûĞÎ
-        static keyHash_t getKeyHash(int key, int modifiler = NO_MODIFILER);
-        static keyHash_t getKeyHash(const QKeyEvent* ev);
-
-        //ÅĞ¶ÏÓÃÍ¾ÀàĞÍ
-        static bool isWinUsage(Usage usage) { return isUsageType(usage, Usage::Win); }
-        static bool isFileUsage(Usage usage) { return isUsageType(usage, Usage::File); }
-        static bool isImgUsage(Usage usage) { return isUsageType(usage, Usage::Img); }
-
-        //»ñÈ¡ÏêÏ¸ÃèÊö
-        //static const char* const desc(const DspStgy stgy);
-
-    private:
-        CCfgHelper() = delete;
-        CCfgHelper(CCfgHelper&) = delete;
-        CCfgHelper(CCfgHelper&&) = delete;
-        ~CCfgHelper() = delete;
-        static bool isUsageType(Usage usage, Usage usageType);
-    };
 }
 #endif  //!CFG_DEF_H

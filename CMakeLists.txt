@@ -51,13 +51,14 @@ set (SRC_IMG_MGR ${DIR_IMG_MGR}/imgMgr.h ${DIR_IMG_MGR}/imgMgr.cpp
 set (SRC_IMG_VIEW ${DIR_IMG_VIEW}/imgView.h ${DIR_IMG_VIEW}/imgView.cpp ${DIR_IMG_VIEW}/imgView.ui
 		${DIR_IMG_VIEW}/imgDspArea.h ${DIR_IMG_VIEW}/imgDspArea.cpp
 		${DIR_IMG_VIEW}/dspStrategy.h ${DIR_IMG_VIEW}/dspStrategy.cpp)
-set (SRC_CFG ${DIR_CFG}/cfgDef.h ${DIR_CFG}/cfgDef.cpp
+set (SRC_CFG ${DIR_CFG}/cfgDef.h ${DIR_CFG}/cfgHelper.h ${DIR_CFG}/cfgHelper.cpp
 		${DIR_CFG}/cfgMgr.h ${DIR_CFG}/cfgMgr.cpp
 		${DIR_CFG}/xmlHelper.h ${DIR_CFG}/xmlHelper.cpp)
 set (SRC_CFG_DLG ${DIR_CFG_DLG}/cfgItem.h ${DIR_CFG_DLG}/cfgItem.cpp
 		${DIR_CFG_DLG}/cfgDlg.h ${DIR_CFG_DLG}/cfgDlg.cpp ${DIR_CFG_DLG}/cfgDlg.ui
 		${DIR_CFG_DLG}/cfgDelegate.h ${DIR_CFG_DLG}/cfgDelegate.cpp
-		${DIR_CFG_DLG}/cfgModel.h ${DIR_CFG_DLG}/cfgModel.cpp)
+		${DIR_CFG_DLG}/cfgModel.h ${DIR_CFG_DLG}/cfgModel.cpp
+		${DIR_CFG_DLG}/cfgEdit.h ${DIR_CFG_DLG}/cfgEdit.cpp)
 
 ##### 项目文件中的目录结构 #####
 source_group (fileMgr FILES ${SRC_FILE_MGR})

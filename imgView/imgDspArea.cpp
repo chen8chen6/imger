@@ -9,6 +9,7 @@
 #include <QScrollBar>
 #include "dspStrategy.h"
 #include "cfgMgr.h"
+#include "cfgHelper.h"  //getKeyHash(), isUsage()
 
 using std::chrono::steady_clock;
 using std::chrono::duration_cast;

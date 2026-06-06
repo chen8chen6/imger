@@ -5,25 +5,28 @@
 namespace CFG {
     QStandardItem* CFG::tag_cfgItem::toItem(void)
     {
+        //TODO: QVariantä¸ä¸ºç©ºæ—¶æ‰setData
         static QPixmap pxTemplate(200, 50);
         static QPainter painter;
 
-        //ÅäÖÃÏîÃû³ÆÒÔÍ¼Æ¬·½Ê½ÏÔÊ¾
+        //é…ç½®é¡¹åç§°ä»¥å›¾ç‰‡æ–¹å¼æ˜¾ç¤º
         auto* item = new QStandardItem;
         QPixmap cfgNamePixmap = pxTemplate.copy();
         painter.begin(&cfgNamePixmap);
         painter.drawText(cfgNamePixmap.rect(), Qt::AlignCenter, cfgName);
         painter.end();
 
-        item->setData(editor, Role::EditorRole);    //±à¼­Æ÷ÀàÐÍ
-        item->setData(cfgName, Role::CfgNameRole);  //ÅäÖÃÏîÃû³Æ
-        item->setData(cfgNamePixmap, Qt::DecorationRole);   //ÅäÖÃÏîÃû³Æ-Í¼±ê
-        item->setData(cfgDesc, Qt::DisplayRole);    //µ±Ç°ÅäÖÃÖµµÄ½âÊÍ
+        item->setData(editor, Role::EditorRole);    //ç¼–è¾‘å™¨ç±»åž‹
+        item->setData(cfgName, Role::CfgNameRole);  //é…ç½®é¡¹åç§°
+        item->setData(cfgNamePixmap, Qt::DecorationRole);   //é…ç½®é¡¹åç§°-å›¾æ ‡
+        item->setData(cfgDesc, Role::CfgDescRole);    //å½“å‰é…ç½®å€¼çš„è§£é‡Š
         item->setData(cfgValType, Role::CfgValTypeRole);
         item->setData(cfgValAddr, Role::CfgValAddrRole);
-        item->setData(cfgVal, Role::CfgValRole);    //µ±Ç°ÅäÖÃÖµ
-        item->setData(cbDescs, Role::ComboBoxItemsRole);    //comboBoxµÄÏÔÊ¾ÏîÄ¿
-        item->setData(cbVals, Role::ComboBoxValsRole);      //comboBoxÏÔÊ¾ÏîÄ¿¶ÔÓ¦µÄÖµ
+        item->setData(keyUsageDictAddr, Role::KeyUsageDictAddrRole);
+        item->setData(cfgVal, Role::CfgValRole);    //å½“å‰é…ç½®å€¼
+        item->setData(cfgVal, Role::OldCfgValRole);    //ä¿®æ”¹å‰çš„é…ç½®å€¼
+        item->setData(cbDescs, Role::ComboBoxItemsRole);    //comboBoxçš„æ˜¾ç¤ºé¡¹ç›®
+        item->setData(cbVals, Role::ComboBoxValsRole);      //comboBoxæ˜¾ç¤ºé¡¹ç›®å¯¹åº”çš„å€¼
 
         return item;
     }
@@ -36,7 +39,9 @@ namespace CFG {
             .setcfgDesc(index.data(Role::CfgDescRole).toString())
             .setcfgValType(index.data(Role::CfgValTypeRole).toInt())
             .setcfgValAddr(index.data(Role::CfgValAddrRole).toULongLong())
+            .setkeyUsageDictAddr(index.data(Role::KeyUsageDictAddrRole).toULongLong())
             .setcfgVal(index.data(Role::CfgValRole))
+            .setoldCfgVal(index.data(Role::OldCfgValRole))
             .setcbDescs(index.data(Role::ComboBoxItemsRole).toStringList())
             .setcbVals(index.data(Role::ComboBoxValsRole).toList());
     }

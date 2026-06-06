@@ -17,44 +17,60 @@ namespace CFG {
     {
         InvalidValType = 0,
         IntValType,
+        KeyHashValType,
     };
 
     enum Role
     {
         CfgDescRole = 0, //Qt::DisplayRole,
+        //SortRole = Qt::SortRole;
         UserRole = 256, //Qt::UserRole,
         CfgNameRole,
+
+        //ç”¨äºç›´æ¥ä¿®æ”¹TCfgé‡Œçš„å¯¹åº”å˜é‡
         CfgValTypeRole,
-        CfgValAddrRole,
         CfgValRole,
+        OldCfgValRole,
+        CfgValAddrRole,
+
+        //TODO: keyHashå•ç‹¬å­˜ä¸ªrole?
+        //ç”¨äºä¿®æ”¹Keybinding, ç›´æ¥å­˜mapåœ°å€, å› ä¸ºmapçš„èŠ‚ç‚¹åœ°å€æ˜¯ä¼šå¤±æ•ˆçš„
+        //KeyHashRole,
+        KeyUsageDictAddrRole,
+
+        //ç”¨äºç”ŸæˆEditor
         EditorRole,
         ComboBoxItemsRole,
         ComboBoxValsRole,
-        //IntRangeRole,
-        KeyHashRole,
     };
 
     enum Editor
     {
         InvalidEditor = 0,
-        IntEditor_comboBox, //TODO: cbBoxµÄvalÀï¶¼ÊÇQVariant, µ¹Ã»±ØÒªÇø·ÖIntºÍString
+        IntEditor_comboBox, //TODO: cbBoxçš„valé‡Œéƒ½æ˜¯QVariant, å€’æ²¡å¿…è¦åŒºåˆ†Intå’ŒString
         IntEditor_line,
         KeyEditor,
     };
 
     typedef struct tag_cfgItem
     {
-        PROPERTY_WITH_SETTER(int, editor);          //±à¼­Æ÷ÀàĞÍ
-        PROPERTY_WITH_SETTER(QString, cfgName);     //ÅäÖÃÏîÃû³Æ
-        PROPERTY_WITH_SETTER(QString, cfgDesc);     //µ±Ç°ÅäÖÃÖµµÄ½âÊÍ
-        PROPERTY_WITH_SETTER(int, cfgValType);      //ÅäÖÃÖµµÄÊı¾İÀàĞÍ
-        PROPERTY_WITH_SETTER(unsigned long long, cfgValAddr);      //ÅäÖÃÖµµÄÄÚ´æµØÖ·
-        PROPERTY_WITH_SETTER(QVariant, cfgVal);     //µ±Ç°ÅäÖÃÖµ
-        PROPERTY_WITH_SETTER(QStringList, cbDescs); //comboBoxµÄÏÔÊ¾ÏîÄ¿
-        PROPERTY_WITH_SETTER(QList<QVariant>, cbVals);//comboBoxÏÔÊ¾ÏîÄ¿¶ÔÓ¦µÄÖµ
+        PROPERTY_WITH_SETTER(QString, cfgName);     //é…ç½®é¡¹åç§°
+        PROPERTY_WITH_SETTER(QString, cfgDesc);     //å½“å‰é…ç½®å€¼çš„è§£é‡Š
+        PROPERTY_WITH_SETTER(int, cfgValType);      //é…ç½®å€¼çš„æ•°æ®ç±»å‹
+        PROPERTY_WITH_SETTER(QVariant, cfgVal);     //å½“å‰é…ç½®å€¼
+        PROPERTY_WITH_SETTER(QVariant, oldCfgVal);     //ä¿®æ”¹å‰çš„é…ç½®å€¼
+
+        //ä¿®æ”¹ç»‘å®šçš„é…ç½®å˜é‡æ—¶ä½¿ç”¨
+        PROPERTY_WITH_SETTER(unsigned long long, cfgValAddr);      //é…ç½®å€¼çš„å†…å­˜åœ°å€
+        PROPERTY_WITH_SETTER(unsigned long long, keyUsageDictAddr);      //keyUsageDictçš„å†…å­˜åœ°å€
+
+        //ç”Ÿæˆeditoræ—¶ä½¿ç”¨
+        PROPERTY_WITH_SETTER(int, editor);          //ç¼–è¾‘å™¨ç±»å‹
+        PROPERTY_WITH_SETTER(QStringList, cbDescs); //comboBoxçš„æ˜¾ç¤ºé¡¹ç›®
+        PROPERTY_WITH_SETTER(QList<QVariant>, cbVals);//comboBoxæ˜¾ç¤ºé¡¹ç›®å¯¹åº”çš„å€¼
 
         static tag_cfgItem fromItem(const QModelIndex& index);
-        QStandardItem* toItem(void);
+        QStandardItem* toItem(void);    //è¿™ä¸ªItemæ˜¯newå‡ºæ¥çš„, æ²¡æœ‰ç§»äº¤ç»™modelçš„è¯, éœ€è¦æ‰‹åŠ¨delete
 
 
     } TCfgItem;

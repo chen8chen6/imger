@@ -8,6 +8,7 @@
 #include "imgMgr.h"
 #include "fileMgr.h"
 #include "cfgMgr.h"
+#include "cfgHelper.h"  //getKeyHash()
 
 using CFG::CCfgMgr;
 using CFG::CCfgHelper;
@@ -44,18 +45,15 @@ int CImgView::init(const QString& filePath, const CCfgMgr* cfgMgr)
 
         //图片管理
         //如果返回空指针,代表初始化失败
-        auto dspOrder = (static_cast<int>(CFG::DspOrder::ByName) == cfg->imgView.dspOrder)    //TODO: 在imgMgr类的内部实际处理最终顺序
+        auto dspOrder = (CFG::DspOrder::ByName == cfg->imgView.dspOrder)    //TODO: 在imgMgr类的内部实际处理最终顺序
             ? QDir::SortFlags(QDir::Name | QDir::IgnoreCase)
             : QDir::SortFlags(QDir::Time);
         m_imgMgr = CImgMgrFac::create(filePath, dspOrder);
         if (nullptr == m_imgMgr)
             break;
 
-        //设置显示策略
-        ui->scrollArea->init(cfgMgr);
-
-        //显示图片
-        display(m_imgMgr->cur().get());
+        ui->scrollArea->init(cfgMgr);   //设置显示策略
+        display(m_imgMgr->cur().get()); //显示图片
 
         isSucc = true;
     } while (0);

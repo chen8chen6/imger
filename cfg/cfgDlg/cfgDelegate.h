@@ -19,7 +19,8 @@ namespace CFG {
     private:
         int getEditorType(const QModelIndex& index) const;
         int getCfgValType(const QModelIndex& index) const;
-        QWidget* createEditor(QWidget* parent, const tag_cfgItem& cfgItem) const;
+        QWidget* createComboBoxEditor(QWidget* parent, const tag_cfgItem& cfgItem) const;
+        QWidget* createKeyEditor(QWidget* parent, const tag_cfgItem& cfgItem) const;
     };
 
 }   //!namespace CFG

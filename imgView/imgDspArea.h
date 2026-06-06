@@ -28,7 +28,6 @@ class CDspStrategy;
 namespace CFG
 {
     class CCfgMgr;
-    enum class DspStgy;
 }
 
 static constexpr int operator ""_percent(unsigned long long percent) { return percent; };

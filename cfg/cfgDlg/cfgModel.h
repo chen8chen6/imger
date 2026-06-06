@@ -2,18 +2,19 @@
 #define CFG_MODEL_H
 
 #include <QStandardItemModel>
+#include "cfgMgr.h" //CCfgMgr::TCfg
 
-#if 1
+#if 0
 #include <QPersistentModelIndex>
 #include <QMap>
-#include "cfgMgr.h"
 #endif
 
 
 namespace CFG {
 
-    class CCfgMgr;
+    //class CCfgMgr;
     struct tag_cfgItem;
+    typedef keyHash_t;
     class CCfgItemModel : public QStandardItemModel
     {
         Q_OBJECT
@@ -30,10 +31,13 @@ namespace CFG {
     private:
         void buildModel(void);
         void updateCfg(const QModelIndex& index);
+        QStandardItem* createComboBoxItem(QString&& cfgName, QString&& cfgDesc, int* bindingValAddr,
+            QStringList&& cbDescs, QVariantList&& cbVals) const;
+        QStandardItem* createKeyUsageItem(keyHash_t keyHash, Usage usage, std::map<keyHash_t, Usage>* pDict) const;
 
     private:
         CCfgMgr* m_cfgMgr = nullptr;
-        CCfgMgr::TCfg m_cfgBak;
+        CCfgMgr::TCfg m_cfgBak; //TODO:使用指针
     };
 }
 

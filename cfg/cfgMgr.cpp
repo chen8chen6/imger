@@ -4,9 +4,10 @@
 #include <QFile>
 #include <QCoreApplication> //applicationDirPath()
 #include <QDebug>
-#include "xmlHelper.h"
+#include "xmlHelper.h"  //appendChild(), parseChild()
+#include "cfgHelper.h"  //getKeyHash()
 
-//TODO: imgViewÀïÒªÓÃµÄ·Åµ½ÁíÒ»¸öÍ·ÎÄ¼şÀï
+//TODO: imgViewé‡Œè¦ç”¨çš„æ”¾åˆ°å¦ä¸€ä¸ªå¤´æ–‡ä»¶é‡Œ
 #define EMPTY_QSTR      QStringLiteral("")
 #define TGT_XML         QStringLiteral("xml")
 #define DATA_VER_ENCODE QStringLiteral("version=\"1.0\" encoding=\"UTF-8\"")
@@ -92,7 +93,7 @@ namespace CFG {
     {
         TCfg cfg;
         cfg.imgView.dspStgy = static_cast<int>(DspStgy::FitWin);
-        cfg.imgView.dspOrder = static_cast<int>(DspOrder::ByName);
+        cfg.imgView.dspOrder = DspOrder::ByName;
 
         //keyBinding
         auto& keyBinding = cfg.imgView.keyUsageDict;
@@ -103,7 +104,7 @@ namespace CFG {
         APPEND_KEY_USAGE(Qt::Key_Left, MOD_CTRL, Usage::Prev_Img);
 
         APPEND_KEY_USAGE(Qt::Key_Plus, NO_MODIFILER, Usage::ZoomIn);
-        APPEND_KEY_USAGE(Qt::Key_Plus, MOD_SHIFT, Usage::ZoomIn);   //Ê¹ÓÃ +/= ¼üÊ±, ĞèÒª°´shiftÊäÈë+
+        APPEND_KEY_USAGE(Qt::Key_Plus, MOD_SHIFT, Usage::ZoomIn);   //ä½¿ç”¨ +/= é”®æ—¶, éœ€è¦æŒ‰shiftè¾“å…¥+
         APPEND_KEY_USAGE(Qt::Key_Minus, NO_MODIFILER, Usage::ZoomOut);
         APPEND_KEY_USAGE(Qt::Key_Equal, NO_MODIFILER, Usage::ZoomReset);
         APPEND_KEY_USAGE(Qt::Key_Up, NO_MODIFILER, Usage::SightUp);
@@ -150,9 +151,9 @@ namespace CFG {
         bool isSucc = false;
         do
         {
-            CXmlHelper::TXmlNode parsedNode;    //ÓÃÀ´½ÓÊÕ½Úµã½âÎö½á¹û
+            CXmlHelper::TXmlNode parsedNode;    //ç”¨æ¥æ¥æ”¶èŠ‚ç‚¹è§£æç»“æœ
 
-            //TODO: ÕÒ²»µ½½Úµã, ²»ÖĞÖ¹½âÎö, ¶øÊÇÓÃÄ¬ÈÏÖµ
+            //TODO: æ‰¾ä¸åˆ°èŠ‚ç‚¹, ä¸ä¸­æ­¢è§£æ, è€Œæ˜¯ç”¨é»˜è®¤å€¼
             auto imgView = root.firstChildElement(TAG_IMG_VIEW);
             if (imgView.isNull())
                 break;
@@ -176,7 +177,7 @@ namespace CFG {
             auto keyUsage = keyUsageDict.firstChildElement();
             while (!keyUsage.isNull())
             {
-                //TODO: ²»ÄÜÓĞ1¸ö°´¼ü±»·ÖÅäµ½2¸ö¹¦ÄÜ
+                //TODO: ä¸èƒ½æœ‰1ä¸ªæŒ‰é”®è¢«åˆ†é…åˆ°2ä¸ªåŠŸèƒ½
                 keyHash_t keyHash = keyUsage.attribute(ATTR_KEY_HASH).toLongLong(nullptr, 16);
                 Usage usage = static_cast<Usage>(keyUsage.attribute(ATTR_USAGE).toInt(nullptr, 16));
                 keyBindingCfg.insert({ keyHash, usage });
@@ -208,13 +209,14 @@ namespace CFG {
 
     void CCfgMgr::appendKeyUsage(QDomDocument& doc, QDomElement& parent, keyHash_t keyHash, Usage usage)
     {
+        static QString comment(" %1: %2 ");
         CXmlHelper::appendChild(doc, parent, CXmlHelper::TXmlNode{
-            TAG_KEY_USAGE, NO_TAG_VAL,
+            TAG_KEY_USAGE, "",
             {
                 {ATTR_KEY_HASH, QString::number(keyHash, 16)},
                 {ATTR_USAGE, QString::number(static_cast<int>(usage), 16)}
             },
-            NO_COMMENT });
+            comment.arg(CCfgHelper::desc(usage), CCfgHelper::desc(keyHash)) });
         return;
     }
 }//!namespace CFG

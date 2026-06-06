@@ -15,9 +15,9 @@ namespace CFG
         {
             int dspStgy = 0;    //0: RealSize; 1: FitWin
             int dspOrder = 0;   //0: SortByName, 1: SortByTime
-            std::map<keyHash_t, Usage> keyUsageDict;    //使用keyHash索引找对应的usage
+            std::map<keyHash_t, Usage> keyUsageDict;    //浣跨敤keyHash绱㈠紩鎵惧搴旂殑usage
         } TImgViewCfg;
-        typedef struct tag_cfg { TImgViewCfg imgView; } TCfg;
+        typedef struct tag_cfg { TImgViewCfg imgView; } TCfg;   //TODO:鍙互鏀惧埌cfgDef閲屽幓? 濡傛灉鍙湁MVC鐢ㄥ埌, 鐢氳嚦鍙互鏀惧埌cfgItem閲屽幓
 
     public:
         static CCfgMgr* getSingleton(void);
@@ -27,7 +27,6 @@ namespace CFG
         void update(const TCfg& other) { m_cfg = other; };
         void update(TCfg&& other) { std::swap(m_cfg, other); };
         const TCfg* getCfg(void) const { return &m_cfg; }
-        //int set(const CCFG *cfg); //TODO: TCFG &&
 
     private:
         static constexpr char CFG_FILE_NAME[] = "config.xml";
