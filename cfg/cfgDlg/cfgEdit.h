@@ -10,7 +10,7 @@ namespace CFG {
     class CKeyEdit : public QLineEdit
     {
     public:
-        CKeyEdit(const keyUsageDict_t* pDict, QWidget* parent = nullptr);
+        explicit CKeyEdit(const keyUsageDict_t* pDict, QWidget* parent = nullptr);
         ~CKeyEdit(void) override;
 
         void keyPressEvent(QKeyEvent* ev) override;

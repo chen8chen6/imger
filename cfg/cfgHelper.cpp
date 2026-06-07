@@ -4,10 +4,10 @@
 #include <QDebug>
 
 #define USAGE_DESC(usage, desc) \
-    { Usage::##usage,QString::fromUtf8(desc) }
+    { Usage::usage, QString::fromUtf8(desc) }
 
 #define KEY_DESC(key, desc) \
-    { Qt::##key, QStringLiteral(desc) },
+    { Qt::key, QStringLiteral(desc) },
 
 
 namespace CFG

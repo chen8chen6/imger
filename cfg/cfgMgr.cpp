@@ -186,7 +186,7 @@ namespace CFG {
 
             isSucc = true;
         } while (0);
-        return 0;
+        return isSucc ? 0 : -1;
     }
 
     int CCfgMgr::saveFile(QDomDocument& doc) const

@@ -1,18 +1,18 @@
 #include "imgType.h"
 
-tag_imgFile::tag_imgFile(QFileInfo info, std::shared_ptr<QPixmap> pImg, bool isReady)
+tag_imgFile::tag_imgFile(const QFileInfo& info, const pImg_t& pImg, bool isReady)
+    : m_info(info), m_pImg(pImg)
 {
-    m_info = info;
-    m_pImg = pImg;
     std::atomic_init(&m_isReady, isReady);
 }
+
 
 tag_imgFile::tag_imgFile(const tag_imgFile& other)
 {
     *this = other;
 }
 
-tag_imgFile::tag_imgFile(tag_imgFile&& other)
+tag_imgFile::tag_imgFile(tag_imgFile&& other) noexcept
 {
     *this = std::move(other);
 }
@@ -26,7 +26,7 @@ tag_imgFile& tag_imgFile::operator=(const tag_imgFile& other)
     return *this;
 }
 
-tag_imgFile& tag_imgFile::operator=(tag_imgFile&& other)
+tag_imgFile& tag_imgFile::operator=(tag_imgFile&& other) noexcept
 {
     m_info.swap(other.m_info);
     m_pImg.swap(other.m_pImg);

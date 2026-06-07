@@ -13,14 +13,14 @@ typedef std::shared_ptr<QPixmap> pImg_t;
 typedef struct tag_imgFile
 {
 public:
-    tag_imgFile(QFileInfo info = QFileInfo(),
-        pImg_t pImg = nullptr,
+    tag_imgFile(const QFileInfo& info = QFileInfo(),
+        const pImg_t& pImg = nullptr,
         bool isReady = false);
     tag_imgFile(const tag_imgFile& other);
-    tag_imgFile(tag_imgFile&& other);
+    tag_imgFile(tag_imgFile&& other) noexcept;
 
     tag_imgFile& operator= (const tag_imgFile& other);
-    tag_imgFile& operator= (tag_imgFile&& other);
+    tag_imgFile& operator= (tag_imgFile&& other) noexcept;
 
 public:
     QFileInfo m_info;
