@@ -7,7 +7,6 @@
 #include "xmlHelper.h"  //appendChild(), parseChild()
 #include "cfgHelper.h"  //getKeyHash()
 
-//TODO: imgView里要用的放到另一个头文件里
 #define EMPTY_QSTR      QStringLiteral("")
 #define TGT_XML         QStringLiteral("xml")
 #define DATA_VER_ENCODE QStringLiteral("version=\"1.0\" encoding=\"UTF-8\"")
@@ -93,7 +92,7 @@ namespace CFG {
     {
         TCfg cfg;
         cfg.imgView.dspStgy = static_cast<int>(DspStgy::FitWin);
-        cfg.imgView.dspOrder = DspOrder::ByName;
+        cfg.imgView.dspOrder = static_cast<int>(DspOrder::ByName);
 
         //keyBinding
         auto& keyBinding = cfg.imgView.keyUsageDict;

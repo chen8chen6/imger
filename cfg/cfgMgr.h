@@ -1,7 +1,6 @@
 #ifndef CFG_MGR_H
 #define CFG_MGR_H
 
-#include <map>
 #include "cfgDef.h"
 
 class QDomDocument;
@@ -10,15 +9,6 @@ namespace CFG
 {
     class CCfgMgr
     {
-    public:
-        typedef struct tag_imgViewCfg
-        {
-            int dspStgy = 0;    //0: RealSize; 1: FitWin
-            int dspOrder = 0;   //0: SortByName, 1: SortByTime
-            std::map<keyHash_t, Usage> keyUsageDict;    //使用keyHash索引找对应的usage
-        } TImgViewCfg;
-        typedef struct tag_cfg { TImgViewCfg imgView; } TCfg;   //TODO:可以放到cfgDef里去? 如果只有MVC用到, 甚至可以放到cfgItem里去
-
     public:
         static CCfgMgr* getSingleton(void);
         int load(void);

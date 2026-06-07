@@ -1,42 +1,25 @@
 #ifndef CFG_DEF_H
 #define CFG_DEF_H
 
-//TODO: 转成enum
-#define NO_MODIFILER    0x0
-#define MOD_CTRL        0x1
-#define MOD_ALT         0x2
-#define MOD_SHIFT       0x4
+#include <map>
 
 namespace CFG
 {
-    typedef long long keyHash_t;
-
     //显示策略
-    //enum放在class里既有独立命名空间, 作为int使用时又不用static_cast
-    class DspStgy
+    enum class DspStgy
     {
-    public:
-        enum Stgy
-        {
-            RealSize = 0,
-            FitWin,
-        };
-        //TODO: desc函数可以放在这里, enum也可以使用Q_ENUM
+        RealSize = 0,
+        FitWin,
     };
 
     //显示顺序
-    class DspOrder
+    enum class DspOrder
     {
-    public:
-        enum Order
-        {
-            ByName = 0,
-            ByTime,
-        };
+        ByName = 0,
+        ByTime,
     };
 
     //键鼠操作对应的功能/用途
-    //这个枚举使用时需要避免隐式转换, 因此使用enum class
     enum class Usage
     {
         Invalid = 0,
@@ -69,5 +52,14 @@ namespace CFG
         SightRight_1px,
     };
 
+    typedef long long keyHash_t;
+    typedef std::map<keyHash_t, Usage> keyUsageDict_t;
+    typedef struct tag_imgViewCfg
+    {
+        int dspStgy = 0;    //0: RealSize; 1: FitWin
+        int dspOrder = 0;   //0: SortByName, 1: SortByTime
+        keyUsageDict_t keyUsageDict;    //使用keyHash索引找对应的usage
+    } TImgViewCfg;
+    typedef struct tag_cfg { TImgViewCfg imgView; } TCfg;
 }
 #endif  //!CFG_DEF_H

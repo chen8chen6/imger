@@ -20,19 +20,16 @@ namespace CFG {
         {
             //完成编辑, 取消焦点
             setKeyHash(CCfgHelper::getKeyHash(ev));
-            emit editingFinished();
+            //emit editingFinished(); //TODO: necessary?
             clearFocus();
         }
-
         return;
     }
 
     void CKeyEdit::keyReleaseEvent(QKeyEvent* ev)
     {
         if (CCfgHelper::isModKey(ev->key()))
-        {
             setText(CCfgHelper::desc(CCfgHelper::getKeyHash(ev)));
-        }
         return;
     }
 

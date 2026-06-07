@@ -2,7 +2,7 @@
 #include "ui_cfgDlg.h"
 #include <QStandardItemModel>
 #include <QPainter>
-#include "cfgMgr.h";
+#include "cfgMgr.h"
 #include "cfgDelegate.h"
 #include "cfgModel.h"
 

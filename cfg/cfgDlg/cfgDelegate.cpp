@@ -13,7 +13,7 @@ namespace CFG {
         {
         case CFG::InvalidEditor:
             break;
-        case CFG::IntEditor_comboBox:
+        case CFG::ComboBoxEditor:
             res = createComboBoxEditor(parent, TCfgItem::fromItem(index));
             break;
         case CFG::IntEditor_line:
@@ -34,7 +34,7 @@ namespace CFG {
         {
         case CFG::InvalidEditor:
             break;
-        case CFG::IntEditor_comboBox:
+        case CFG::ComboBoxEditor:
         {
             QComboBox* cb = static_cast<QComboBox*>(editor);
             int idx = cb->findData(index.data(Role::CfgValRole));
@@ -64,7 +64,7 @@ namespace CFG {
         {
         case CFG::InvalidEditor:
             break;
-        case CFG::IntEditor_comboBox:
+        case CFG::ComboBoxEditor:
         {
             /**
             * 调用setData()会触发setEditor()引起数据变动,
@@ -102,19 +102,13 @@ namespace CFG {
         return (varType.canConvert<int>()) ? varType.toInt() : Editor::InvalidEditor;
     }
 
-    int CCfgDele::getCfgValType(const QModelIndex& index) const
-    {
-        QVariant varType = index.data(Role::CfgValTypeRole);
-        return (varType.canConvert<int>()) ? varType.toInt() : CfgValType::InvalidValType;
-    }
-
     QWidget* CCfgDele::createComboBoxEditor(QWidget* parent, const TCfgItem& cfgItem) const
     {
         //添加选项
         QComboBox* cb = new QComboBox(parent);
-        const int cnt = std::min(cfgItem.cbDescs.count(), cfgItem.cbVals.count());
+        const int cnt = std::min(cfgItem.cbItems.count(), cfgItem.cbVals.count());
         for (int i = 0; i < cnt; ++i)
-            cb->addItem(cfgItem.cbDescs.at(i), cfgItem.cbVals.at(i));
+            cb->addItem(cfgItem.cbItems.at(i), cfgItem.cbVals.at(i));
         return cb;
     }
 

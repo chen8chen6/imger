@@ -249,7 +249,7 @@ qreal CImgDspArea::zoomCoord(const qreal Xm, const int percent, const int curZoo
      * 设中心点横坐标为 Xm, 则有图片可见横坐标范围为[Xm - L, Xm + L] = [S1, E1] (L*2 + 1 = dsp.width)
      * Xm本身宽度1像素, 其中心离原点的距离为 Xm + 0.5,
      * 将图片缩放 z(z>0) 倍后, Xm2离原点距离为 Xm2 + 0.5 = (Xm + 0.5) * z,
-     * 可得通项公式: Xm2 = (Xm - 0.5) * z + 0.5.
+     * 可得通项公式: Xm2 = (Xm + 0.5) * z - 0.5.
      * 新的可见横坐标范围为[Xm2 - L, Xm2 + L] = [S2, E2], 需落在图片范围内
      * 故有:
      * f(x) = (x + 0.5) * z - 0.5

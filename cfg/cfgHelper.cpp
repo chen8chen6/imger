@@ -23,19 +23,6 @@ namespace CFG
         return getKeyHash(ev->key(), getMod(ev));
     }
 
-    int CCfgHelper::getMod(const QKeyEvent* ev)
-    {
-        int mod = NO_MODIFILER;
-        auto modFlags = ev->modifiers();
-        if (modFlags.testFlag(Qt::ControlModifier))
-            mod |= MOD_CTRL;
-        if (modFlags.testFlag(Qt::AltModifier))
-            mod |= MOD_ALT;
-        if (modFlags.testFlag(Qt::ShiftModifier))
-            mod |= MOD_SHIFT;
-        return mod;
-    }
-
     bool CCfgHelper::isModKey(int key)
     {
         return (Qt::Key_Control == key
@@ -43,19 +30,19 @@ namespace CFG
             || Qt::Key_Shift == key);
     }
 
-    QString CCfgHelper::desc(const DspStgy::Stgy stgy)
+    QString CCfgHelper::desc(const DspStgy stgy)
     {
         static const QString descs[] = { QString::fromUtf8("原始大小"), QString::fromUtf8("适应窗口") };
         const int cnt = sizeof(descs) / sizeof(descs[0]);
-        const int idx = stgy;
+        const int idx = static_cast<int>(stgy);
         return (0 <= idx && idx < cnt) ? descs[idx] : QStringLiteral("Unknown");
     }
 
-    QString CCfgHelper::desc(const DspOrder::Order order)
+    QString CCfgHelper::desc(const DspOrder order)
     {
         static const QString descs[] = { QString::fromUtf8("按文件名"), QString::fromUtf8("按时间") };
         const int cnt = sizeof(descs) / sizeof(descs[0]);
-        const int idx = order;
+        const int idx = static_cast<int>(order);
         return (0 <= idx && idx < cnt) ? descs[idx] : QStringLiteral("Unknown");
     }
 
@@ -116,6 +103,19 @@ namespace CFG
             KEY_DESC(Key_X, "x"),
         };
         return (dict.count(key) > 0) ? dict.at(key) : QStringLiteral("unknown");
+    }
+
+    int CCfgHelper::getMod(const QKeyEvent* ev)
+    {
+        int mod = NO_MODIFILER;
+        auto modFlags = ev->modifiers();
+        if (modFlags.testFlag(Qt::ControlModifier))
+            mod |= MOD_CTRL;
+        if (modFlags.testFlag(Qt::AltModifier))
+            mod |= MOD_ALT;
+        if (modFlags.testFlag(Qt::ShiftModifier))
+            mod |= MOD_SHIFT;
+        return mod;
     }
 
     bool CCfgHelper::isUsageType(Usage usage, Usage usageType)

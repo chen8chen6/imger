@@ -5,45 +5,42 @@
 namespace CFG {
     QStandardItem* CFG::tag_cfgItem::toItem(void)
     {
-        //TODO: QVariant不为空时才setData
+        //配置项名称以图片方式显示
         static QPixmap pxTemplate(200, 50);
         static QPainter painter;
-
-        //配置项名称以图片方式显示
-        auto* item = new QStandardItem;
         QPixmap cfgNamePixmap = pxTemplate.copy();
         painter.begin(&cfgNamePixmap);
-        painter.drawText(cfgNamePixmap.rect(), Qt::AlignCenter, cfgName);
+        painter.drawText(cfgNamePixmap.rect(), Qt::AlignCenter, name);
         painter.end();
 
-        item->setData(editor, Role::EditorRole);    //编辑器类型
-        item->setData(cfgName, Role::CfgNameRole);  //配置项名称
+        auto* item = new QStandardItem;
+        item->setData(name, Role::CfgNameRole);
         item->setData(cfgNamePixmap, Qt::DecorationRole);   //配置项名称-图标
-        item->setData(cfgDesc, Role::CfgDescRole);    //当前配置值的解释
-        item->setData(cfgValType, Role::CfgValTypeRole);
-        item->setData(cfgValAddr, Role::CfgValAddrRole);
+        item->setData(valType, Role::CfgValTypeRole);
+        item->setData(val, Role::CfgValRole);
+        item->setData(valDesc, Role::CfgDescRole);
+        item->setData(val, Role::OldCfgValRole);
+        item->setData(valAddr, Role::CfgValAddrRole);
         item->setData(keyUsageDictAddr, Role::KeyUsageDictAddrRole);
-        item->setData(cfgVal, Role::CfgValRole);    //当前配置值
-        item->setData(cfgVal, Role::OldCfgValRole);    //修改前的配置值
-        item->setData(cbDescs, Role::ComboBoxItemsRole);    //comboBox的显示项目
-        item->setData(cbVals, Role::ComboBoxValsRole);      //comboBox显示项目对应的值
-
+        item->setData(editor, Role::EditorRole);
+        item->setData(cbItems, Role::ComboBoxItemsRole);
+        item->setData(cbVals, Role::ComboBoxValsRole);
         return item;
     }
 
     tag_cfgItem tag_cfgItem::fromItem(const QModelIndex& index)
     {
         return tag_cfgItem()
-            .seteditor(index.data(Role::EditorRole).toInt())
-            .setcfgName(index.data(Role::CfgNameRole).toString())
-            .setcfgDesc(index.data(Role::CfgDescRole).toString())
-            .setcfgValType(index.data(Role::CfgValTypeRole).toInt())
-            .setcfgValAddr(index.data(Role::CfgValAddrRole).toULongLong())
-            .setkeyUsageDictAddr(index.data(Role::KeyUsageDictAddrRole).toULongLong())
-            .setcfgVal(index.data(Role::CfgValRole))
-            .setoldCfgVal(index.data(Role::OldCfgValRole))
-            .setcbDescs(index.data(Role::ComboBoxItemsRole).toStringList())
-            .setcbVals(index.data(Role::ComboBoxValsRole).toList());
+            .set_name(index.data(Role::CfgNameRole).toString())
+            .set_valType(index.data(Role::CfgValTypeRole).toInt())
+            .set_val(index.data(Role::CfgValRole))
+            .set_valDesc(index.data(Role::CfgDescRole).toString())
+            .set_oldVal(index.data(Role::OldCfgValRole))
+            .set_valAddr(index.data(Role::CfgValAddrRole).toULongLong())
+            .set_keyUsageDictAddr(index.data(Role::KeyUsageDictAddrRole).toULongLong())
+            .set_editor(index.data(Role::EditorRole).toInt())
+            .set_cbItems(index.data(Role::ComboBoxItemsRole).toStringList())
+            .set_cbVals(index.data(Role::ComboBoxValsRole).toList());
     }
 
 }   //!namespace CFG

@@ -50,9 +50,9 @@ namespace CFG {
             int* pStgy = &(m_cfgBak.imgView.dspStgy);
             auto* dspStgy = createComboBoxItem(
                 QString::fromUtf8("显示策略"),
-                CCfgHelper::desc(static_cast<DspStgy::Stgy>(*pStgy)), pStgy,
+                CCfgHelper::desc(static_cast<DspStgy>(*pStgy)), pStgy,
                 { CCfgHelper::desc(DspStgy::RealSize), CCfgHelper::desc(DspStgy::FitWin) },
-                { DspStgy::RealSize , DspStgy::FitWin });
+                { static_cast<int>(DspStgy::RealSize) ,static_cast<int>(DspStgy::FitWin) });
             imgView->appendRow(dspStgy);
         }
 
@@ -61,9 +61,9 @@ namespace CFG {
             int* pOrder = &(m_cfgBak.imgView.dspOrder);
             auto* dspOrder = createComboBoxItem(
                 QString::fromUtf8("显示顺序"),
-                CCfgHelper::desc(static_cast<DspOrder::Order>(*pOrder)), pOrder,
+                CCfgHelper::desc(static_cast<DspOrder>(*pOrder)), pOrder,
                 { CCfgHelper::desc(DspOrder::ByName), CCfgHelper::desc(DspOrder::ByTime) },
-                { DspOrder::ByName, DspOrder::ByTime });
+                { static_cast<int>(DspOrder::ByName), static_cast<int>(DspOrder::ByTime) });
             imgView->appendRow(dspOrder);
         }
 
@@ -87,23 +87,23 @@ namespace CFG {
     void CCfgItemModel::updateCfg(const QModelIndex& index)
     {
         TCfgItem cfgItem = TCfgItem::fromItem(index);
-        if (CfgValType::IntValType == cfgItem.cfgValType)
+        if (CfgValType::IntValType == cfgItem.valType)
         {
-            int newVal = cfgItem.cfgVal.toInt();
-            int* valAddr = reinterpret_cast<int*>(cfgItem.cfgValAddr);
-            //qDebug() << "varAddr = " << QString::number(cfgItem.cfgValAddr, 16);
+            int newVal = cfgItem.val.toInt();
+            int* valAddr = reinterpret_cast<int*>(cfgItem.valAddr);
+            //qDebug() << "varAddr = " << QString::number(cfgItem.valAddr, 16);
             qDebug() << index.data(Role::CfgNameRole).toString() << *valAddr << "->" << newVal;
             *valAddr = newVal;
 
-            setData(index, newVal, Role::OldCfgValRole);//modelItem 里的 oldCfgVal也要更新
+            setData(index, newVal, Role::OldCfgValRole);//modelItem 里的 oldVal也要更新
         }
-        else if (CfgValType::KeyHashValType == cfgItem.cfgValType)
+        else if (CfgValType::KeyHashValType == cfgItem.valType)
         {
-            keyHash_t newVal = cfgItem.cfgVal.toULongLong();
-            keyHash_t oldVal = cfgItem.oldCfgVal.toULongLong();
-            std::map<keyHash_t, Usage>* pDict =
-                reinterpret_cast<std::map<keyHash_t, Usage>*>(cfgItem.keyUsageDictAddr);
-            CFG::Usage usage = pDict->at(oldVal);
+            keyHash_t newVal = cfgItem.val.toULongLong();
+            keyHash_t oldVal = cfgItem.oldVal.toULongLong();
+            keyUsageDict_t* pDict =
+                reinterpret_cast<keyUsageDict_t*>(cfgItem.keyUsageDictAddr);
+            Usage usage = pDict->at(oldVal);
 
             qDebug() << QStringLiteral("%1 : %2 -> %3")
                 .arg(QString::number(static_cast<int>(usage), 16),
@@ -112,38 +112,38 @@ namespace CFG {
             pDict->erase(oldVal);
             pDict->emplace(newVal, usage);
 
-            setData(index, newVal, Role::OldCfgValRole);//modelItem 里的 oldCfgVal也要更新
+            setData(index, newVal, Role::OldCfgValRole);//modelItem 里的 oldVal也要更新
         }
 
 
         return;
     }
 
-    QStandardItem* CCfgItemModel::createComboBoxItem(QString&& cfgName, QString&& cfgDesc, int* bindingValAddr, QStringList&& cbDescs, QVariantList&& cbVals) const
+    QStandardItem* CCfgItemModel::createComboBoxItem(QString&& name, QString&& valDesc, int* bindingValAddr, QStringList&& cbItems, QVariantList&& cbVals) const
     {
         return TCfgItem()
-            .seteditor(Editor::IntEditor_comboBox)
-            .setcfgValType(CfgValType::IntValType)
-            .setcfgName(std::move(cfgName))
-            .setcfgValAddr(reinterpret_cast<unsigned long long>(bindingValAddr))
-            .setcfgVal(*bindingValAddr)
-            .setoldCfgVal(*bindingValAddr)
-            .setcfgDesc(std::move(cfgDesc))
-            .setcbDescs(std::move(cbDescs))
-            .setcbVals(std::move(cbVals))
+            .set_name(std::move(name))
+            .set_valType(CfgValType::IntValType)
+            .set_val(*bindingValAddr)
+            .set_valDesc(std::move(valDesc))
+            .set_oldVal(*bindingValAddr)
+            .set_valAddr(reinterpret_cast<unsigned long long>(bindingValAddr))
+            .set_editor(Editor::ComboBoxEditor)
+            .set_cbItems(std::move(cbItems))
+            .set_cbVals(std::move(cbVals))
             .toItem();
     }
 
-    QStandardItem* CCfgItemModel::createKeyUsageItem(keyHash_t keyHash, Usage usage, std::map<keyHash_t, Usage>* pDict) const
+    QStandardItem* CCfgItemModel::createKeyUsageItem(keyHash_t keyHash, Usage usage, keyUsageDict_t* pDict) const
     {
         return TCfgItem()
-            .seteditor(Editor::KeyEditor)
-            .setcfgName(CCfgHelper::desc(usage))
-            .setcfgValType(CfgValType::KeyHashValType)
-            .setcfgVal(keyHash)
-            .setoldCfgVal(keyHash)
-            .setcfgDesc(CCfgHelper::desc(keyHash))
-            .setkeyUsageDictAddr(reinterpret_cast<unsigned long long>(pDict))
+            .set_name(CCfgHelper::desc(usage))
+            .set_valType(CfgValType::KeyHashValType)
+            .set_val(keyHash)
+            .set_valDesc(CCfgHelper::desc(keyHash))
+            .set_oldVal(keyHash)
+            .set_keyUsageDictAddr(reinterpret_cast<unsigned long long>(pDict))
+            .set_editor(Editor::KeyEditor)
             .toItem();
     }
 
