@@ -45,8 +45,8 @@ int wmain(int argc, wchar_t* argv[])
         QMessageBox::critical(nullptr, "错误", "未传入路径");
         return -1;
     }
-    const QString imgPath = QString::fromWCharArray(argv[1]);
 
+    const QString imgPath = QString::fromWCharArray(argv[1]);
     //载入配置
     CFG::CCfgMgr* cfgMgr = CFG::CCfgMgr::getSingleton();
     if (0 != cfgMgr->load())
@@ -55,11 +55,6 @@ int wmain(int argc, wchar_t* argv[])
         cfgMgr->save();
         cfgMgr->load();
     }
-
-    //TODO: 按F1出现
-    CFG::CCfgDlg dlg;
-    dlg.init(cfgMgr);
-    dlg.exec();
 
     //无框, 占满屏幕
     CImgView imgView;

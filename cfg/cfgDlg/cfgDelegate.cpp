@@ -83,8 +83,9 @@ namespace CFG {
         case CFG::KeyEditor:
         {
             CKeyEdit* k = static_cast<CKeyEdit*>(editor);
+            if (!k->isEditFinished())   //未完成编辑, 新的keyHash不保证有效
+                break;
             keyHash_t keyHash = k->getKeyHash();
-            //TODO: 检测到按键冲突则不更新
             model->setData(index, keyHash, Role::CfgValRole);
             model->setData(index, CCfgHelper::desc(keyHash), Role::CfgDescRole);
             break;
@@ -114,7 +115,8 @@ namespace CFG {
 
     QWidget* CCfgDele::createKeyEditor(QWidget* parent, const tag_cfgItem& cfgItem) const
     {
-        CKeyEdit* k = new CKeyEdit(parent);
+        const keyUsageDict_t* pDict = reinterpret_cast<keyUsageDict_t*>(cfgItem.keyUsageDictAddr);
+        CKeyEdit* k = new CKeyEdit(pDict, parent);
         return k;
     }
 

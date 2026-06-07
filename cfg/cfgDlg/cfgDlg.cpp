@@ -26,8 +26,12 @@ namespace CFG {
         m_cfgMgr = cfgMgr;
         m_model = new CCfgItemModel(this);
         m_model->init(m_cfgMgr);
+
+        //treeview
         ui->tvCfg->setModel(m_model);
+        ui->tvCfg->expandAll();
         ui->tvCfg->setItemDelegate(new CCfgDele);
+
         connect(ui->btnSave, &QPushButton::clicked, this, &CCfgDlg::saveCfgFile);
         return 0;
     }

@@ -41,7 +41,7 @@ namespace CFG {
         */
 
         auto* root = invisibleRootItem();
-        auto* imgView = new QStandardItem("ImgView");
+        auto* imgView = new QStandardItem(QString::fromUtf8("图片浏览"));
         imgView->setEditable(false);
         root->appendRow(imgView);
 
@@ -69,7 +69,7 @@ namespace CFG {
 
         //keyBinding
         {
-            auto* keyBinding = new QStandardItem("key bingding");
+            auto* keyBinding = new QStandardItem(QString::fromUtf8("快捷键"));
             keyBinding->setEditable(false);
             imgView->appendRow(keyBinding);
 

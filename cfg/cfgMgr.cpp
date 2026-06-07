@@ -97,6 +97,7 @@ namespace CFG {
         //keyBinding
         auto& keyBinding = cfg.imgView.keyUsageDict;
         APPEND_KEY_USAGE(Qt::Key_F1, NO_MODIFILER, Usage::Help);
+        APPEND_KEY_USAGE(Qt::Key_F10, NO_MODIFILER, Usage::Config);
         APPEND_KEY_USAGE(Qt::Key_X, NO_MODIFILER, Usage::Next_Img);
         APPEND_KEY_USAGE(Qt::Key_Right, MOD_CTRL, Usage::Next_Img);
         APPEND_KEY_USAGE(Qt::Key_Z, NO_MODIFILER, Usage::Prev_Img);
@@ -176,7 +177,6 @@ namespace CFG {
             auto keyUsage = keyUsageDict.firstChildElement();
             while (!keyUsage.isNull())
             {
-                //TODO: 不能有1个按键被分配到2个功能
                 keyHash_t keyHash = keyUsage.attribute(ATTR_KEY_HASH).toLongLong(nullptr, 16);
                 Usage usage = static_cast<Usage>(keyUsage.attribute(ATTR_USAGE).toInt(nullptr, 16));
                 keyBindingCfg.insert({ keyHash, usage });

@@ -27,6 +27,7 @@ namespace CFG
         //窗口操作
         Win = 0x100,
         Help,
+        Config,
 
         //文件操作
         File = 0x200,

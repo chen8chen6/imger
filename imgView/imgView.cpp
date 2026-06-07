@@ -9,6 +9,7 @@
 #include "fileMgr.h"
 #include "cfgMgr.h"
 #include "cfgHelper.h"  //getKeyHash()
+#include "cfgDlg.h"
 
 using CFG::CCfgMgr;
 using CFG::CCfgHelper;
@@ -119,8 +120,16 @@ void CImgView::keyPressEvent(QKeyEvent* ev)
     switch (usageDict.at(keyHash))
     {
     case Usage::Help:
-        QMessageBox::information(this, "F1", "Help here");
+        //QMessageBox::information(this, "F1", "Help here");
+        //break;
+    case Usage::Config:
+    {
+        //TODO: 这个打开新窗口事件, 理论上应该由imgView的上级部件处理
+        CFG::CCfgDlg cfgDlg(this);
+        cfgDlg.init(CCfgMgr::getSingleton());
+        cfgDlg.exec();
         break;
+    }
     case Usage::Next_Img:
         displayNext();
         break;

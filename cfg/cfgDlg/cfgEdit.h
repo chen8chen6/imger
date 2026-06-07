@@ -10,7 +10,7 @@ namespace CFG {
     class CKeyEdit : public QLineEdit
     {
     public:
-        CKeyEdit(QWidget* parent = nullptr);
+        CKeyEdit(const keyUsageDict_t* pDict, QWidget* parent = nullptr);
         ~CKeyEdit(void) override;
 
         void keyPressEvent(QKeyEvent* ev) override;
@@ -19,8 +19,13 @@ namespace CFG {
         void setKeyHash(keyHash_t other) { m_keyHash = other; }
         keyHash_t getKeyHash(void) { return m_keyHash; }
 
+        bool isEditFinished(void) { return m_isEditFinished; }
+
     private:
+        bool isKeyUsed(keyHash_t keyHash) const;
         keyHash_t m_keyHash = 0;
+        const keyUsageDict_t* const m_keyUsed = nullptr;
+        bool m_isEditFinished = false;
     };
 
 

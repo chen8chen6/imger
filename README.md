@@ -2,6 +2,9 @@
 a rapid image viewer with cache. 
 
 默认快捷键如下:
+
+修改配置: F10
+
 下一张图片: x, Ctrl+→
 
 上一张图片: z, Ctrl+←
