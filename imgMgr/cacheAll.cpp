@@ -10,6 +10,7 @@ CCacheAll::CCacheAll()
 
 int CCacheAll::init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr)
 {
+    //TODO: 目前CacheAll策略有个缺陷: 初始化完成后才会显示第一张图. 与其修改这个类, 我认为应该改写CacheByNum, 使其在一定文件数量下CacheAll
     qDebug() << name();
 
     //缓存
@@ -17,7 +18,7 @@ int CCacheAll::init(const QString& imgPath, std::shared_ptr<CFileMgr> fileMgr)
     for (const auto& file : allFiles)
     {
         //这个策略里, 缓存完成后只读不写
-        pImgFile_t pImgFile(new TImgFile(file, pImg_t(new QPixmap(file.absoluteFilePath()))));
+        pImgFile_t pImgFile(new TImgFile(file, CAbstractImg::create(file)));
         pImgFile->m_isReady = true;
         m_cache.push_back(std::move(pImgFile));
     }

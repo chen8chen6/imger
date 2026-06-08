@@ -39,16 +39,16 @@ int CImgDspArea::init(const CCfgMgr* cfgMgr)
     return 0;
 }
 
-int CImgDspArea::display(QPixmap* img)
+int CImgDspArea::display(const pImg_t& img)
 {
-    m_curImg = *img;
-    QPixmap scaled = *img;
-    m_dspStrategy->process(&scaled);
-    m_lbImg->setPixmap(scaled);
+    m_curImg = img;
+    m_curImgScaled = img;
+    m_dspStrategy->process(m_curImgScaled);
+    m_curImgScaled->displayedBy(m_lbImg);
 
     //更新显示状态
     m_dspSt.m_focus = QPoint(0, 0) + diff_topLeft2Center();
-    m_dspSt.m_zoom_percent = m_curImg.width() > 0 ? scaled.width() * 100 / m_curImg.width() : 100;
+    m_dspSt.m_zoom_percent = m_curImg->width() > 0 ? m_curImgScaled->width() * 100 / m_curImg->width() : 100;
 
     //调整定位
     hScroll->setValue(0);
@@ -143,7 +143,7 @@ void CImgDspArea::resizeEvent(QResizeEvent* ev)
         m_dspStrategy.reset(new CZoomToSize(dspWidth(), dspHeight()));
     }
 
-    display(&m_curImg);    //刷新当前图片显示
+    display(m_curImg);    //刷新当前图片显示
     updateImgFocus();      //更新焦点, 定位
 
     return;
@@ -173,7 +173,7 @@ QPointF CImgDspArea::diff_topLeft2Center() const
       * 因此得通项公式为 Xm(Wd) = (Wd - 1)/2 (Wd>0)
       **/
 
-    const auto imgSize = m_lbImg->pixmap()->size();
+    const auto imgSize = m_curImgScaled->size();
     const qreal w = std::min(dspWidth(), imgSize.width());
     const qreal h = std::min(dspHeight(), imgSize.height());
     return QPointF((w - 1) / 2.0, (h - 1) / 2.0);
@@ -194,7 +194,8 @@ int CImgDspArea::zoom(int percent)
         return 0;
 
     //按比例缩放图片
-    m_lbImg->setPixmap(scaleImg(percent));
+    m_curImgScaled = scaleImg(percent);
+    m_curImgScaled->displayedBy(m_lbImg);
 
     //TODO: 处理上溢出 和0,0,
     //if (m_dspSt.m_focus.x() > INT_MAX/ZOOM_MAX)
@@ -203,7 +204,7 @@ int CImgDspArea::zoom(int percent)
     //TODO: 连按2次放大时, 如果 图片处理速度较慢, 会造成焦点未及时按定位调整
     //TODO: 缓存一张图片的多种倍率
     int curZoom = m_dspSt.m_zoom_percent;
-    const QSize scaled = m_lbImg->pixmap()->size();
+    const QSize scaled = m_curImgScaled->size();
     double xm2 = zoomCoord(m_dspSt.m_focus.x(), percent, curZoom, scaled.width(), dspWidth());
     double ym2 = zoomCoord(m_dspSt.m_focus.y(), percent, curZoom, scaled.height(), dspHeight());
     QPointF newFocus(xm2, ym2);
@@ -228,18 +229,16 @@ int CImgDspArea::zoom(int percent)
     return 0;
 }
 
-QPixmap CImgDspArea::scaleImg(int percent) const
+pImg_t CImgDspArea::scaleImg(int percent) const
 {
     //缩放当前图片
     auto start = steady_clock::now();
     int curZoom = m_dspSt.m_zoom_percent;   //TODO: 换成qreal提升精度?
-    QPixmap scaled = m_curImg.scaled(m_curImg.size() * percent / 100,
-        Qt::KeepAspectRatio,
-        Qt::SmoothTransformation);
+    pImg_t scaled = m_curImg->scaled(m_curImg->width() * percent / 100, m_curImg->height() * percent / 100);
     auto cost = duration_cast<milliseconds>(steady_clock::now() - start);
 
     qDebug() << "zoom(" << cost.count() << "ms)" << curZoom << "->" << percent;
-    qDebug() << " size:" << m_lbImg->pixmap()->size() << "->" << scaled.size();
+    qDebug() << " size:" << m_curImg->size() << "->" << scaled->size();
     return scaled;
 }
 

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <memory>   //std::shared_ptr
+#include "imgType.h"    //pImgFile_t
 
 namespace Ui {
     class CImgView;
@@ -34,8 +35,7 @@ private slots:
 
 private:
     //显示
-    int display(QPixmap* img);
-    int display(tag_imgFile* pImgFile);
+    int display(const pImgFile_t& pImgFile);
 
     //键盘事件响应
     void keyPressEvent(QKeyEvent* ev) override;

@@ -21,6 +21,7 @@
 
 #include <QScrollArea>
 #include <memory>   //std::shared_ptr
+#include "imgType.h"    //pImg_t
 
 class QLabel;
 class QScrollBar;
@@ -41,7 +42,7 @@ public:
     ~CImgDspArea() override {}
     int init(const CFG::CCfgMgr* cfgMgr);
     void setLbImg(QLabel* lb) { m_lbImg = lb; }
-    int display(QPixmap* img);
+    int display(const pImg_t& img);
 
 protected:
     void keyPressEvent(QKeyEvent* ev) override;
@@ -64,7 +65,7 @@ private:
 
     //缩放
     int zoom(int percent);  //percent = [ZOOM_MIN, ZOOM_MAX]
-    QPixmap scaleImg(int percent) const;
+    pImg_t scaleImg(int percent) const;
     qreal zoomCoord(const qreal Xm, const int percent, const int curZoom,
         const int imgWidth, const int dspWidth) const;
 
@@ -77,7 +78,8 @@ private:
     QScrollBar* hScroll = nullptr;     //水平滚动条
     QScrollBar* vScroll = nullptr;     //垂直滚动条
     QLabel* m_lbImg = nullptr;      //用来显示图片的组件
-    QPixmap m_curImg;       //原始图片
+    pImg_t m_curImg;        //原始图片
+    pImg_t m_curImgScaled;  //缩放后的图片
 
     //图片显示策略
     std::shared_ptr<CDspStrategy> m_dspStrategy = nullptr;

@@ -39,6 +39,8 @@ public:
 
 private:
     CImgMgrFac() = delete;
+    CImgMgrFac(const CImgMgrFac&) = delete;
+    CImgMgrFac(CImgMgrFac&&) = delete;
     ~CImgMgrFac() = delete;
 };
 

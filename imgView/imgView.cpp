@@ -54,7 +54,7 @@ int CImgView::init(const QString& filePath, const CCfgMgr* cfgMgr)
             break;
 
         ui->scrollArea->init(cfgMgr);   //设置显示策略
-        display(m_imgMgr->cur().get()); //显示图片
+        display(m_imgMgr->cur()); //显示图片
 
         isSucc = true;
     } while (0);
@@ -70,33 +70,26 @@ int CImgView::init(const QString& filePath, const CCfgMgr* cfgMgr)
 
 int CImgView::displayPrev()
 {
-    return display(m_imgMgr->prev().get());
+    return display(m_imgMgr->prev());
 }
 
 int CImgView::displayNext()
 {
-    return display(m_imgMgr->next().get());
+    return display(m_imgMgr->next());
 }
 
-int CImgView::display(QPixmap* img)
-{
-    QPixmap scaled = *img;
-    ui->scrollArea->display(&scaled);
-    return 0;
-}
-
-int CImgView::display(tag_imgFile* pImgFile)
+int CImgView::display(const pImgFile_t& pImgFile)
 {
     qDebug() << "(display)-> " << pImgFile->m_info.absoluteFilePath();
     if (pImgFile->m_isReady)
     {
-        display(pImgFile->m_pImg.get());
         m_checkLoaded->stop();
+        ui->scrollArea->display(pImgFile->m_pImg);
     }
     else
     {
-        static QPixmap loadingImg(":/res/img/loading.jpg");
-        display(&loadingImg);
+        static pImg_t loading(new CPicture(QPixmap(QStringLiteral(":/res/img/loading.jpg"))));  //TODO: 内存泄露, static变量永远不出作用域?
+        ui->scrollArea->display(loading);
 
         //设置定时器, 每隔一段时间查看图片加载完成
         if (!m_checkLoaded->isActive())
@@ -149,5 +142,5 @@ void CImgView::updateIfLoaded()
 {
     auto pImgFile = m_imgMgr->cur();
     if (m_imgMgr->cur()->m_isReady)
-        display(pImgFile.get());    //缓存完毕, 更新图片
+        display(pImgFile);    //缓存完毕, 更新图片
 }

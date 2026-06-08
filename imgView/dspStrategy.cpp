@@ -13,7 +13,7 @@ CZoomToSize::CZoomToSize(int width, int height)
 
 }
 
-int CZoomToSize::process(QPixmap* img)
+int CZoomToSize::process(pImg_t& img)
 {
     if (0 == img->width() || 0 == img->height())
         return -1;
@@ -21,9 +21,10 @@ int CZoomToSize::process(QPixmap* img)
     //按比例缩放
     double img_whRatio = img->width() * 1.0 / img->height();
     bool isTooWide = img_whRatio > m_whRatio;
-    *img = isTooWide
-        ? img->scaledToWidth(m_width, Qt::SmoothTransformation)
-        : img->scaledToHeight(m_height, Qt::SmoothTransformation);
+
+    img = isTooWide
+        ? img->scaledToWidth(m_width)
+        : img->scaledToHeight(m_height);
 
     return 0;
 }

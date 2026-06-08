@@ -12,8 +12,7 @@
 | + init(filePath: QString, cfgMgr : const CCfgMgr *) : int
 | + displayPrev(void) : int
 | + displayNext(void) : int
-| - display(img: QPixmap*) : int
-| - display(imgFile: pImgFile_t) : int
+| - display(imgFile: const pImgFile_t &) : int
 | - updateIfLoaded(void) : int
  -------------------------------------------------
 
@@ -25,17 +24,16 @@
 | - ZOOM_MAX: int = 1000 {最大缩放倍率, 单位为%}
 | - ZOOM_MIN: int = 5
 | - EV_HANDLER: enum {事件处理方式}
-| - m_curImg: QPixmap
+| - m_curImg: pImg_t
+| - m_curImgScaled: pImg_t {缩放后的图片, 设置新图前都需要有效}
 | - m_dspSt: TDisplaySt
 | - m_lbImg: QLabel*
 | - m_dspStrategy: CDspStrategy*
-| - m_curDspStrategy: DSP_STRATEGY {缩放至适合屏幕/实际大小}
 | - m_cfgMgr : const CCfgMgr * = nullptr
 |-------------------------------------------------
 | + init(cfg : const CCFG *) : int
 | + setLbImg(lb: QLabel*) : void
-| + display(img: QPixmap*) : int
-| ~ event(ev: QEvent*) : bool {处理ScrollArea默认未处理的事件}
+| + display(img: const pImg_t &) : int
 | ~ keyPressEvent(ev: QKeyEvent*) : void 
 | ~ wheelEvent(ev: QWheelEvent*) : void
 | ~ resizeEvent(ev: QResizeEvent*) : void
@@ -43,11 +41,9 @@
 | - diff_topLeft2Center(void) : QPointF {显示区域左上角到中央的距离}
 | - moveSight(handler: EV_HANDLER) : int
 | - moveSight(dx, dy) : int
-| - zoom(handler: EV_HANDLER) : int
 | - zoom(int percent) : int
 | - dspWidth(void) : int {dspArea的宽高(不包括边框和滚动条)}
 | - dspHeight(void) : int
-| - getKeyEvHandler(ev: QKeyEvent*) : EV_HANDLER {根据按键事件类型, 挑选处理事件的方式}
  -------------------------------------------------
 
  -------------------------------------------------
@@ -90,16 +86,45 @@
 |                CDspStrategy
 |       负责以多种策略处理即将显示的图像
 |-------------------------------------------------
-| + process(img: QPixmap*) : int {img即是输入参数也是输出参数}
+| + process(img: pImg_t) : int {img即是输入参数也是输出参数}
  -------------------------------------------------
 
  -------------------------------------------------
-|                TImgFile
+|                CImgFile
 |         文件信息和已载入的图像数据
 |-------------------------------------------------
 | + m_info: QFileInfo
-| + m_pImg: QPixmap*
+| + m_img: pImg_t
 | + m_isReady: atomic_bool
+ -------------------------------------------------
+
+ -------------------------------------------------
+|                CAbstractImg
+|          负责保存已载入的图像数据
+|  {typdef std::shared_ptr<CAbstractImg> pImg_t}
+|      需要支持一部分QPixmap和QMovie的接口
+|-------------------------------------------------
+| + create(fileInfo : QFileInfo &) : pImg_t
+| + load(filePath : const QString&) : bool
+| + displaydBy(lb : QLabel *) : void
+| + scale(w : int, h : int) : pImg_t
+ -------------------------------------------------
+
+ -------------------------------------------------
+|                 CPicture
+|        负责保存静态图像(如jpg)的数据
+|            {CAbstractImg的子类}    
+|-------------------------------------------------
+| - m_pic : QPixmap
+ -------------------------------------------------
+
+ -------------------------------------------------
+|                 CMovie
+|        负责保存动态图像(如gif)的数据
+|            {CAbstractImg的子类}    
+|-------------------------------------------------
+| - m_raw : QBuffer {QMovie不支持直接复制, 因此将生成QMovie的源数据保存在内存中}
+| - m_movie : std::shared_ptr<QMovie>
  -------------------------------------------------
 
  -------------------------------------------------

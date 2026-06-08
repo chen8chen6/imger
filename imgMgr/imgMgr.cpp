@@ -1,4 +1,5 @@
 #include "imgMgr.h"
+#include <QImageReader> //supportedImageFormats()
 #include "cacheByNum.h"
 #include "cacheAll.h"
 #include "fileMgr.h"
@@ -34,7 +35,13 @@ int CImgMgr::uninitImgLoaderThr()
 
 std::shared_ptr<CImgMgr> CImgMgrFac::create(const QString& filePath, QDir::SortFlags sorting)
 {
-    static const QList<QString> imgSuffix = { "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp" };
+    //获取支持的图片类型的后缀名
+    const auto supportImageFormats = QImageReader::supportedImageFormats();
+    QStringList imgSuffix;
+    imgSuffix.reserve(supportImageFormats.size());
+    for (const auto& fmt : supportImageFormats)
+        imgSuffix << QStringLiteral("*.%1").arg(QString(fmt));
+
     std::shared_ptr<CImgMgr> ret = nullptr;
     bool isSucc = false;
 

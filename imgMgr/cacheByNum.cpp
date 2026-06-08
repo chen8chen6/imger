@@ -127,7 +127,7 @@ pImgFile_t CCacheByNum::next()
 
 int CCacheByNum::cachePrev(QFileInfo file)
 {
-    pImgFile_t pImgFile(new TImgFile(file, pImg_t(new QPixmap)));
+    pImgFile_t pImgFile(new TImgFile(file, nullptr));
     m_cache.push_front(pImgFile);
     emit sigLoadImg(QVariant::fromValue(m_cache.front()));
     return 0;
@@ -135,7 +135,7 @@ int CCacheByNum::cachePrev(QFileInfo file)
 
 int CCacheByNum::cacheNext(QFileInfo file)
 {
-    pImgFile_t pImgFile(new TImgFile(file, pImg_t(new QPixmap)));
+    pImgFile_t pImgFile(new TImgFile(file, nullptr));
     m_cache.push_back(pImgFile);
     emit sigLoadImg(QVariant::fromValue(m_cache.back()));
     return 0;
