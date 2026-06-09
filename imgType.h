@@ -28,6 +28,9 @@ public:
     virtual int width(void) const = 0;
     virtual int height(void) const = 0;
     virtual QSize size(void) const = 0;
+
+private:
+    static bool isMovie(const QString& suffix);
 };
 
 //用来储存静态图像(png等)
@@ -52,6 +55,8 @@ class CMovie : public CAbstractImg
 public:
     CMovie(const QString& filePath);
     CMovie(const CMovie& other);
+    CMovie& operator=(const CMovie&) = delete;
+
     void displayedBy(QLabel* lb) const override;
     pImg_t scaled(int w, int h) const override;
     pImg_t scaledToWidth(int w) const override;
@@ -59,7 +64,8 @@ public:
     int width(void) const override;
     int height(void) const override;
     QSize size(void) const override;
-    CMovie& operator=(const CMovie&) = delete;
+    int frameCount(void) const;
+    QPixmap firstPixmap(void) const;
 
 private:
     QBuffer m_raw;      //QMovie不支持直接复制, 因此将生成QMovie的源数据保存在内存中

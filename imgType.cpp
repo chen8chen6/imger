@@ -44,14 +44,16 @@ CPicture::CPicture(QPixmap&& pic)
 
 pImg_t CAbstractImg::create(const QFileInfo& file)
 {
-    static const auto MOVIE_SUFFIX_LIST = QMovie::supportedFormats();
-    QString suffix = file.suffix();
-    for (const auto& movSuf : MOVIE_SUFFIX_LIST)
-    {
-        if (suffix == movSuf)
-            return pImg_t(new CMovie(file.absoluteFilePath()));
-    }
-    return pImg_t(new CPicture(QPixmap(file.absoluteFilePath())));
+    if (!isMovie(file.suffix()))
+        return pImg_t(new CPicture(QPixmap(file.absoluteFilePath())));
+
+    //如果动图只有1帧, 视作静图处理
+    CMovie* mov = new CMovie(file.absoluteFilePath());
+    pImg_t res(mov);
+    if (1 == mov->frameCount())
+        res.reset(new CPicture(QPixmap(mov->firstPixmap())));
+
+    return res;
 }
 
 void CPicture::displayedBy(QLabel* lb) const
@@ -77,6 +79,17 @@ pImg_t CPicture::scaledToWidth(int w) const
 pImg_t CPicture::scaledToHeight(int h) const
 {
     return pImg_t(new CPicture(m_pic.scaledToHeight(h, Qt::SmoothTransformation)));
+}
+
+bool CAbstractImg::isMovie(const QString& suffix)
+{
+    static const auto MOVIE_SUFFIX_LIST = QMovie::supportedFormats();
+    for (const auto& movSuf : MOVIE_SUFFIX_LIST)
+    {
+        if (suffix == movSuf)
+            return true;
+    }
+    return false;
 }
 
 int CPicture::width(void) const
@@ -154,20 +167,15 @@ int CMovie::height(void) const
 
 QSize CMovie::size(void) const
 {
-    /**
-    * scaledSize只在setScaledSize后才会返回有效值, 否则返回{-1, -1}
-    * frameRect只在有帧更新后才会返回有效值, 否则返回{0,0,0,0},
-    * TODO: 此处默认所有帧size一致, 但理论上每一帧的size可以不同,
-    **/
+    // TODO: 此处默认所有帧size一致, 但理论上每一帧的size可以不同,
     static const QRect INVALID_FRAME_RECT{ 0,0,0,0 };
     static const QSize INVALID_SIZE{ -1,-1 };
-    qDebug() << m_movie->currentFrameNumber()
-        << "scaled: " << m_movie->scaledSize()
-        << "frm: " << m_movie->frameRect();
 
+    //scaledSize只在setScaledSize后才会返回有效值, 否则返回{-1, -1}
     if (INVALID_SIZE != m_movie->scaledSize())
         return m_movie->scaledSize();
 
+    //frameRect只在有帧更新后才会返回有效值, 否则返回{0,0,0,0},
     QRect fmRect = m_movie->frameRect();
     if (INVALID_FRAME_RECT != fmRect)
         return { fmRect.width(), fmRect.height() };
@@ -175,8 +183,16 @@ QSize CMovie::size(void) const
     //尝试更新一帧, 更新frameRect
     m_movie->jumpToNextFrame();
     fmRect = m_movie->frameRect();
-    qDebug() << m_movie->currentFrameNumber()
-        << "scaled: " << m_movie->scaledSize()
-        << "frm: " << m_movie->frameRect();
     return { fmRect.width(), fmRect.height() };
+}
+
+int CMovie::frameCount(void) const
+{
+    return m_movie->frameCount();
+}
+
+QPixmap CMovie::firstPixmap(void) const
+{
+    m_movie->jumpToFrame(0);
+    return m_movie->currentPixmap();
 }

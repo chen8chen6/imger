@@ -32,6 +32,7 @@ namespace CFG
 }
 
 static constexpr int operator ""_percent(unsigned long long percent) { return percent; };
+static constexpr int operator ""_px(unsigned long long px) { return px; };
 
 class CImgDspArea : public QScrollArea
 {
@@ -49,9 +50,14 @@ protected:
     void wheelEvent(QWheelEvent* ev) override;
     void resizeEvent(QResizeEvent* ev) override;
 
+    void mousePressEvent(QMouseEvent* ev) override;
+    void mouseMoveEvent(QMouseEvent* ev) override;
+    void mouseReleaseEvent(QMouseEvent* ev) override;
+
 private:
-    static constexpr int ZOOM_MAX = 1000_percent;   //最大缩放倍率
-    static constexpr int ZOOM_MIN = 5_percent;      //最小缩放倍率
+    static constexpr int ZOOM_MAX = 1000_percent;   //最大缩放倍率(百分比)
+    static constexpr int ZOOM_MIN = 5_percent;      //最小缩放倍率(百分比)
+    static constexpr int DRAG_DISTANCE_MIN = 3_px;  //最小拖动距离(像素)
 
 private:
     //更新图片焦点
@@ -86,8 +92,14 @@ private:
 
     struct {
         QPointF m_focus = QPointF(0.0, 0.0); //图片焦点, 即图片显示在dspArea正中的像素点坐标
-        int m_zoom_percent = 100;       //缩放倍率, 100表示100%
+        int m_zoom_percent = 100_percent;       //缩放倍率, 100表示100%
     } m_dspSt;  //图片展示参数    //TODO: rename->imgCfg?
+
+    //鼠标拖动图片
+    struct {
+        bool m_isDragging = false;
+        QPoint dragStartPos = QPoint(-1, -1);
+    } m_mouse;
 };
 
 #endif // CIMGDSPAREA_H

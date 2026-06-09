@@ -53,12 +53,17 @@ int CImgDspArea::display(const pImg_t& img)
     //调整定位
     hScroll->setValue(0);
     vScroll->setValue(0);
+
+    updateImgFocus();      //更新焦点, 定位
+
     return 0;
 }
 
 void CImgDspArea::keyPressEvent(QKeyEvent* ev)
 {
     qDebug() << "dspArea:" << ev << ev->isAccepted();
+    if (m_mouse.m_isDragging)  //拖动图片时, 不响应其它事件
+        return;
 
     keyHash_t keyHash = CCfgHelper::getKeyHash(ev);
     const auto& dict = m_cfgMgr->getCfg()->imgView.keyUsageDict;
@@ -81,36 +86,28 @@ void CImgDspArea::keyPressEvent(QKeyEvent* ev)
         zoom(100);  //原始大小
         break;
     case Usage::SightUp:
-        moveSight(0, 0 - dspHeight() / 4);
-        updateImgFocus();
+        moveSight(0, 0 - dspHeight() / 8);
         break;
     case Usage::SightDown:
-        moveSight(0, dspHeight() / 4);
-        updateImgFocus();
+        moveSight(0, dspHeight() / 8);
         break;
     case Usage::SightLeft:
-        moveSight(0 - dspWidth() / 4, 0);
-        updateImgFocus();
+        moveSight(0 - dspWidth() / 8, 0);
         break;
     case Usage::SightRight:
-        moveSight(dspWidth() / 4, 0);
-        updateImgFocus();
+        moveSight(dspWidth() / 8, 0);
         break;
     case Usage::SightUp_1px:
         moveSight(0, -1);
-        updateImgFocus();
         break;
     case Usage::SightDown_1px:
         moveSight(0, 1);
-        updateImgFocus();
         break;
     case Usage::SightLeft_1px:
         moveSight(-1, 0);
-        updateImgFocus();
         break;
     case Usage::SightRight_1px:
         moveSight(1, 0);
-        updateImgFocus();
         break;
     default:
         //do nothing
@@ -123,6 +120,7 @@ void CImgDspArea::keyPressEvent(QKeyEvent* ev)
 
 void CImgDspArea::wheelEvent(QWheelEvent* ev)
 {
+#if 0
     QPoint pix = ev->pixelDelta();
     QPoint angle = ev->angleDelta();
 
@@ -130,6 +128,7 @@ void CImgDspArea::wheelEvent(QWheelEvent* ev)
 
     QScrollArea::wheelEvent(ev);    //执行默认操作
     updateImgFocus();    //更新图片焦点
+#endif
     return;
 }
 
@@ -144,9 +143,49 @@ void CImgDspArea::resizeEvent(QResizeEvent* ev)
     }
 
     display(m_curImg);    //刷新当前图片显示
-    updateImgFocus();      //更新焦点, 定位
 
     return;
+}
+
+void CImgDspArea::mousePressEvent(QMouseEvent* ev)
+{
+    if (Qt::LeftButton == ev->button())
+        m_mouse.dragStartPos = ev->pos();   //防手抖, 不在按下时就开始拖拽
+    return;
+}
+
+void CImgDspArea::mouseMoveEvent(QMouseEvent* ev)
+{
+    if (!ev->buttons().testFlag(Qt::LeftButton))
+        return;
+
+    if (!m_mouse.m_isDragging
+        && (m_mouse.dragStartPos - ev->pos()).manhattanLength() >= DRAG_DISTANCE_MIN)
+    {
+        //按着左键移动了一定距离, 进入拖动状态
+        setCursor(Qt::ClosedHandCursor);
+        m_mouse.m_isDragging = true;
+        QPoint mvSight = m_mouse.dragStartPos - ev->pos();
+        m_mouse.dragStartPos = ev->pos();
+        moveSight(mvSight.x(), mvSight.y());
+    }
+    else if (m_mouse.m_isDragging)
+    {
+        //拖动中, 持续更新鼠标位置
+        QPoint mvSight = m_mouse.dragStartPos - ev->pos();
+        m_mouse.dragStartPos = ev->pos();
+        moveSight(mvSight.x(), mvSight.y());
+    }
+    return;
+}
+
+void CImgDspArea::mouseReleaseEvent(QMouseEvent* ev)
+{
+    if (Qt::LeftButton == ev->button())
+    {
+        m_mouse.m_isDragging = false;
+        setCursor(Qt::ArrowCursor);
+    }
 }
 
 void CImgDspArea::updateImgFocus()
@@ -180,11 +219,18 @@ QPointF CImgDspArea::diff_topLeft2Center() const
 }
 int CImgDspArea::moveSight(int dx, int dy)
 {
-    if (0 != dx)
-        hScroll->setValue(hScroll->value() + dx);
-    if (0 != dy)
-        vScroll->setValue(vScroll->value() + dy);
+    bool isDxInvalid = (hScroll->minimum() == hScroll->value() && dx <= 0)
+        || (hScroll->maximum() == hScroll->value() && dx >= 0);
+    bool isDyInvalid = (vScroll->minimum() == vScroll->value() && dy <= 0)
+        || (vScroll->maximum() == vScroll->value() && dy >= 0);
+    if (isDxInvalid && isDyInvalid)
+        return 0;
 
+    if (!isDxInvalid)
+        hScroll->setValue(hScroll->value() + dx);
+    if (!isDyInvalid)
+        vScroll->setValue(vScroll->value() + dy);
+    updateImgFocus();   //更新图片焦点
     return 0;
 }
 
@@ -212,7 +258,6 @@ int CImgDspArea::zoom(int percent)
     //计算scrollBar的value, 即图片显示在dspArea最左上方的像素点的坐标
     QPointF newTopLeft = newFocus - diff_topLeft2Center();   //TODO: <0?
     qDebug() << "focus:" << m_dspSt.m_focus << "->" << newFocus;
-    qDebug() << "O:" << newTopLeft;
 
     //更新展示状态
     m_dspSt.m_focus = newFocus;

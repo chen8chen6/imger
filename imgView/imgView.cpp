@@ -22,6 +22,7 @@ CImgView::CImgView(QWidget* parent) :
 {
     ui->setupUi(this);
 
+    ui->lbImg->setStyleSheet(QStringLiteral("background-color: black;"));
     ui->scrollArea->setLbImg(ui->lbImg);
 
     //图片载入完成时, 进行更新
@@ -88,7 +89,7 @@ int CImgView::display(const pImgFile_t& pImgFile)
     }
     else
     {
-        static pImg_t loading(new CPicture(QPixmap(QStringLiteral(":/res/img/loading.jpg"))));  //TODO: 内存泄露, static变量永远不出作用域?
+        static pImg_t loading(new CPicture(QPixmap(QStringLiteral(":/res/img/loading.jpg"))));
         ui->scrollArea->display(loading);
 
         //设置定时器, 每隔一段时间查看图片加载完成
